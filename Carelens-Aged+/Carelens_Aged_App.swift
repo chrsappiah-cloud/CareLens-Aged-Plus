@@ -1,10 +1,3 @@
-//
-//  Carelens_Aged_App.swift
-//  Carelens-Aged+
-//
-//  Created by Christopher Appiah-Thompson  on 7/5/2026.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,7 +5,11 @@ import SwiftData
 struct Carelens_Aged_App: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            ClientProfile.self,
+            AssessmentSession.self,
+            AssessmentSection.self,
+            CarePlan.self,
+            MonitoringEvent.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -23,9 +20,43 @@ struct Carelens_Aged_App: App {
         }
     }()
 
+    @StateObject private var authService = AuthenticationService.shared
+    @AppStorage("hasLoadedMockData") private var hasLoadedMockData = false
+
+    init() {
+        let tabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithOpaqueBackground()
+        tabBarAppearance.backgroundEffect = UIBlurEffect(style: .systemChromeMaterialDark)
+        tabBarAppearance.backgroundColor = UIColor(Color.black.opacity(0.35))
+        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = UIColor.systemMint
+        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+            .foregroundColor: UIColor.systemMint
+        ]
+        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
+        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor.white.withAlphaComponent(0.5)
+        ]
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if authService.isAuthenticated {
+                    RootTabView()
+                        .onAppear {
+                            if !hasLoadedMockData {
+                                let context = sharedModelContainer.mainContext
+                                MockData.populateSampleData(context: context)
+                                hasLoadedMockData = true
+                            }
+                        }
+                } else {
+                    LoginView()
+                }
+            }
+            .environmentObject(authService)
         }
         .modelContainer(sharedModelContainer)
     }
