@@ -27,15 +27,21 @@ struct Carelens_Aged_App: App {
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithOpaqueBackground()
         tabBarAppearance.backgroundEffect = UIBlurEffect(style: .systemChromeMaterialDark)
-        tabBarAppearance.backgroundColor = UIColor(Color.black.opacity(0.35))
-        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = UIColor.systemMint
+        tabBarAppearance.backgroundColor = UIColor(Color.black.opacity(0.55))
+
+        let selectedColor = UIColor(red: 0.95, green: 0.85, blue: 0.35, alpha: 1.0)
+        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = selectedColor
         tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-            .foregroundColor: UIColor.systemMint
+            .foregroundColor: selectedColor,
+            .font: UIFont.systemFont(ofSize: 10, weight: .bold)
         ]
-        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.5)
+
+        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.75)
         tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-            .foregroundColor: UIColor.white.withAlphaComponent(0.5)
+            .foregroundColor: UIColor.white.withAlphaComponent(0.75),
+            .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
         ]
+
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
     }

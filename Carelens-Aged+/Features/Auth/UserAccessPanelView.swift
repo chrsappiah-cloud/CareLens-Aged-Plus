@@ -36,7 +36,7 @@ struct UserAccessPanelView: View {
                         .font(.title3.bold())
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color(red: 0.4, green: 0.85, blue: 0.9), Color(red: 0.3, green: 0.65, blue: 0.95)],
+                                colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
                                 startPoint: .leading, endPoint: .trailing
                             )
                         )
@@ -59,7 +59,7 @@ struct UserAccessPanelView: View {
                 .font(.headline)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Color(red: 0.4, green: 0.85, blue: 0.9), Color(red: 0.3, green: 0.65, blue: 0.95)],
+                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
                         startPoint: .leading, endPoint: .trailing
                     )
                 )

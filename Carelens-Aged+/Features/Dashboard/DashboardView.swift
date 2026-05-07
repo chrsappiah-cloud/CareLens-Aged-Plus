@@ -6,10 +6,16 @@ struct DashboardView: View {
     @Query(sort: \AssessmentSession.updatedAt, order: .reverse) private var assessments: [AssessmentSession]
     @Query(sort: \MonitoringEvent.timestamp, order: .reverse) private var recentEvents: [MonitoringEvent]
 
+    @State private var navigateToClients = false
+    @State private var navigateToAssessments = false
+    @State private var navigateToMonitoring = false
+    @State private var selectedClient: ClientProfile?
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: CareLensTheme.sectionSpacing) {
+                    quickActionsBar
                     alertsSection
                     caseloadOverview
                     recentActivitySection
@@ -21,6 +27,27 @@ struct DashboardView: View {
             .navigationTitle("Dashboard")
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationDestination(isPresented: $navigateToClients) {
+                ClientListView()
+            }
+            .navigationDestination(isPresented: $navigateToAssessments) {
+                AssessmentsHomeView()
+            }
+            .navigationDestination(for: ClientProfile.self) { client in
+                ClientDetailView(client: client)
+            }
+        }
+    }
+
+    private var quickActionsBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                QuickActionButton(title: "New Intake", icon: "person.badge.plus", action: {})
+                QuickActionButton(title: "Start Assessment", icon: "checklist", action: { navigateToAssessments = true })
+                QuickActionButton(title: "View Clients", icon: "person.2", action: { navigateToClients = true })
+                QuickActionButton(title: "Generate Report", icon: "doc.text", action: {})
+                QuickActionButton(title: "Log Incident", icon: "exclamationmark.triangle", action: {})
+            }
         }
     }
 
@@ -55,30 +82,39 @@ struct DashboardView: View {
                 .font(.headline)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Color(red: 0.4, green: 0.85, blue: 0.9), Color(red: 0.3, green: 0.65, blue: 0.95)],
+                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
                         startPoint: .leading, endPoint: .trailing
                     )
                 )
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                FuturisticStatCard(
-                    title: "Total Clients",
-                    value: "\(clients.count)",
-                    icon: "person.2.fill",
-                    level: .info
-                )
-                FuturisticStatCard(
-                    title: "Active Assessments",
-                    value: "\(assessments.filter { $0.status != "Completed" }.count)",
-                    icon: "checklist",
-                    level: .warning
-                )
+                Button(action: { navigateToClients = true }) {
+                    FuturisticStatCard(
+                        title: "Total Clients",
+                        value: "\(clients.count)",
+                        icon: "person.2.fill",
+                        level: .info
+                    )
+                }
+                .buttonStyle(.plain)
+
+                Button(action: { navigateToAssessments = true }) {
+                    FuturisticStatCard(
+                        title: "Active Assessments",
+                        value: "\(assessments.filter { $0.status != "Completed" }.count)",
+                        icon: "checklist",
+                        level: .warning
+                    )
+                }
+                .buttonStyle(.plain)
+
                 FuturisticStatCard(
                     title: "Due Reviews",
                     value: "\(dueReviewCount)",
                     icon: "calendar.badge.exclamationmark",
                     level: .warning
                 )
+
                 FuturisticStatCard(
                     title: "Recent Incidents",
                     value: "\(recentEvents.prefix(7).count)",
@@ -95,7 +131,7 @@ struct DashboardView: View {
                 .font(.headline)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Color(red: 0.4, green: 0.85, blue: 0.9), Color(red: 0.3, green: 0.65, blue: 0.95)],
+                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
                         startPoint: .leading, endPoint: .trailing
                     )
                 )
@@ -136,7 +172,7 @@ struct DashboardView: View {
                 .font(.headline)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Color(red: 0.4, green: 0.85, blue: 0.9), Color(red: 0.3, green: 0.65, blue: 0.95)],
+                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
                         startPoint: .leading, endPoint: .trailing
                     )
                 )
@@ -149,7 +185,50 @@ struct DashboardView: View {
         }
     }
 
-    private var dueReviewCount: Int { 0 }
+    private var dueReviewCount: Int {
+        assessments.filter { assessment in
+            guard let review = Calendar.current.date(byAdding: .month, value: 1, to: assessment.updatedAt) else { return false }
+            return review <= Calendar.current.date(byAdding: .day, value: 7, to: .now) ?? .now
+        }.count
+    }
+}
+
+struct QuickActionButton: View {
+    let title: String
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [CareLensTheme.Colors.goldLight, CareLensTheme.Colors.emeraldGreen],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 40, height: 40)
+                    .background(Color.white.opacity(0.06))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                Text(title)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(CareLensTheme.Colors.textSecondary)
+                    .lineLimit(1)
+            }
+            .frame(width: 80)
+            .padding(.vertical, 10)
+            .background(.ultraThinMaterial)
+            .background(Color.white.opacity(0.03))
+            .cornerRadius(14)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 struct FuturisticStatCard: View {
@@ -169,8 +248,9 @@ struct FuturisticStatCard: View {
                 .foregroundStyle(
                     LinearGradient(
                         colors: [
-                            Color(red: 0.5, green: 0.95, blue: 0.9),
-                            Color(red: 0.3, green: 0.7, blue: 1.0)
+                            Color(red: 0.40, green: 0.45, blue: 0.92),
+                            Color(red: 0.65, green: 0.40, blue: 0.82),
+                            Color(red: 0.72, green: 0.52, blue: 0.35)
                         ],
                         startPoint: .top,
                         endPoint: .bottom

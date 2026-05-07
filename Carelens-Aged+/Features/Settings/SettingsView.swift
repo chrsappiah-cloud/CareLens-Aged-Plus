@@ -108,17 +108,20 @@ struct SettingsView: View {
                     } label: {
                         Label("Social Media & Community", systemImage: "globe")
                     }
-                    Link(destination: URL(string: "https://carelens.health")!) {
+                    Link(destination: URL(string: "https://wcs-full.vercel.app")!) {
                         Label("Visit Website", systemImage: "safari")
                     }
-                    Link(destination: URL(string: "https://x.com/CareLensAged")!) {
+                    Link(destination: URL(string: "mailto:christopher.appiahthompson@myworldclass.org")!) {
+                        Label("Helpline", systemImage: "envelope.fill")
+                    }
+                    Link(destination: URL(string: "https://x.com/chaborachris")!) {
                         Label("Follow on X", systemImage: "bubble.left.and.text.bubble.right")
                     }
-                    Link(destination: URL(string: "https://linkedin.com/company/carelens")!) {
+                    Link(destination: URL(string: "https://linkedin.com/in/christopher-appiah-thompson")!) {
                         Label("LinkedIn", systemImage: "link.circle.fill")
                     }
                 } header: {
-                    Label("Connect", systemImage: "network")
+                    Label("Connect & Helpline", systemImage: "network")
                         .foregroundStyle(Color(red: 0.85, green: 0.70, blue: 0.20))
                 }
 

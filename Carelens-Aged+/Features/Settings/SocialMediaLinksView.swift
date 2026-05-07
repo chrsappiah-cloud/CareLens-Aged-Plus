@@ -14,58 +14,58 @@ struct SocialMediaLinksView: View {
         SocialMediaLink(
             platform: "Website",
             icon: "globe",
-            url: "https://carelens.health",
-            username: "carelens.health",
+            url: "https://wcs-full.vercel.app",
+            username: "wcs-full.vercel.app",
             color: CareLensTheme.Colors.accentMint
+        ),
+        SocialMediaLink(
+            platform: "Helpline Email",
+            icon: "envelope.fill",
+            url: "mailto:christopher.appiahthompson@myworldclass.org",
+            username: "christopher.appiahthompson@myworldclass.org",
+            color: CareLensTheme.Colors.goldPrimary
         ),
         SocialMediaLink(
             platform: "X (Twitter)",
             icon: "bubble.left.and.text.bubble.right",
-            url: "https://x.com/CareLensAged",
-            username: "@CareLensAged",
+            url: "https://x.com/chaborachris",
+            username: "@chaborachris",
             color: Color(red: 0.4, green: 0.7, blue: 0.95)
         ),
         SocialMediaLink(
             platform: "LinkedIn",
             icon: "link.circle.fill",
-            url: "https://linkedin.com/company/carelens",
-            username: "CareLens Health",
+            url: "https://linkedin.com/in/christopher-appiah-thompson",
+            username: "Christopher Appiah-Thompson",
             color: Color(red: 0.0, green: 0.47, blue: 0.71)
         ),
         SocialMediaLink(
             platform: "Instagram",
             icon: "camera.circle.fill",
-            url: "https://instagram.com/carelens_health",
-            username: "@carelens_health",
+            url: "https://instagram.com/chaborachris",
+            username: "@chaborachris",
             color: Color(red: 0.83, green: 0.18, blue: 0.55)
         ),
         SocialMediaLink(
             platform: "YouTube",
             icon: "play.rectangle.fill",
-            url: "https://youtube.com/@CareLensHealth",
-            username: "CareLens Health",
+            url: "https://youtube.com/@chaborachris",
+            username: "@chaborachris",
             color: Color(red: 0.9, green: 0.15, blue: 0.15)
         ),
         SocialMediaLink(
             platform: "Facebook",
             icon: "person.2.circle.fill",
-            url: "https://facebook.com/CareLensHealth",
-            username: "CareLens Health",
+            url: "https://facebook.com/chaborachris",
+            username: "Christopher Appiah-Thompson",
             color: Color(red: 0.23, green: 0.35, blue: 0.60)
         ),
         SocialMediaLink(
             platform: "TikTok",
             icon: "music.note.list",
-            url: "https://tiktok.com/@carelens_health",
-            username: "@carelens_health",
+            url: "https://tiktok.com/@chaborachris",
+            username: "@chaborachris",
             color: Color(red: 0.0, green: 0.0, blue: 0.0)
-        ),
-        SocialMediaLink(
-            platform: "Support Email",
-            icon: "envelope.fill",
-            url: "mailto:support@carelens.health",
-            username: "support@carelens.health",
-            color: CareLensTheme.Colors.accentAmber
         ),
     ]
 

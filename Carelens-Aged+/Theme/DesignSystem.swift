@@ -18,11 +18,16 @@ struct CareLensTheme {
         static let emeraldGreen     = Color(red: 0.18, green: 0.80, blue: 0.45)
         static let deepForest       = Color(red: 0.05, green: 0.45, blue: 0.25)
 
-        static let cardFill         = Color.white.opacity(0.06)
-        static let cardBorder       = Color.white.opacity(0.35)
-        static let textPrimary      = Color(red: 0.85, green: 0.97, blue: 1.0)
-        static let textSecondary    = Color(red: 0.55, green: 0.88, blue: 0.82)
-        static let textTertiary     = Color(red: 0.40, green: 0.65, blue: 0.72)
+        static let cardFill         = Color.white.opacity(0.08)
+        static let cardBorder       = Color.white.opacity(0.40)
+        // High-contrast dark text palette for maximum readability
+        static let textPrimary      = Color.white                                 // Pure white — highest contrast
+        static let textSecondary    = Color(red: 0.88, green: 0.85, blue: 0.92)  // Bright lavender-white
+        static let textTertiary     = Color(red: 0.72, green: 0.68, blue: 0.75)  // Muted purple-grey
+        // Rich accent text colors
+        static let textDeepBlue     = Color(red: 0.50, green: 0.58, blue: 0.98)  // Vivid royal blue
+        static let textPurple       = Color(red: 0.75, green: 0.50, blue: 0.95)  // Bright purple
+        static let textChocolate    = Color(red: 0.82, green: 0.62, blue: 0.38)  // Bold warm gold
 
         static let riskRed          = Color(red: 0.95, green: 0.28, blue: 0.28)
         static let safeGreen        = Color(red: 0.20, green: 0.88, blue: 0.55)
@@ -92,6 +97,28 @@ struct CareLensTheme {
             startPoint: .top,
             endPoint: .bottom
         )
+
+        static let headingText = LinearGradient(
+            colors: [Colors.textDeepBlue, Colors.textPurple],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+
+        static let bodyText = LinearGradient(
+            colors: [Colors.textPurple, Colors.textChocolate],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+
+        static let richText = LinearGradient(
+            colors: [
+                Color(red: 0.35, green: 0.40, blue: 0.85),
+                Color(red: 0.60, green: 0.35, blue: 0.78),
+                Color(red: 0.70, green: 0.48, blue: 0.30)
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 
     static let cardCornerRadius: CGFloat = 22
@@ -135,9 +162,20 @@ struct CLCardStyle: ViewModifier {
             .cornerRadius(CareLensTheme.cardCornerRadius)
             .overlay(
                 RoundedRectangle(cornerRadius: CareLensTheme.cardCornerRadius, style: .continuous)
-                    .strokeBorder(CareLensTheme.Gradients.cardBorder, lineWidth: 0.8)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                CareLensTheme.Colors.goldPrimary.opacity(0.3),
+                                CareLensTheme.Colors.emeraldGreen.opacity(0.2),
+                                Color.white.opacity(0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.8
+                    )
             )
-            .shadow(color: .black.opacity(0.35), radius: 12, x: 0, y: 8)
+            .shadow(color: .black.opacity(0.4), radius: 12, x: 0, y: 8)
     }
 }
 
@@ -161,11 +199,11 @@ struct StatusChip: View {
                 .shadow(color: color.opacity(0.7), radius: 3)
             Text(title)
                 .font(.caption.bold())
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.white)
         }
         .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(Capsule().fill(Color.white.opacity(0.08)))
+        .padding(.vertical, 5)
+        .background(Capsule().fill(Color.white.opacity(0.10)))
     }
 }
 

@@ -57,7 +57,7 @@ struct RootTabView: View {
                     .tabItem { Label("Settings", systemImage: "gearshape") }
                     .tag(5)
             }
-            .tint(CareLensTheme.Colors.accentMint)
+            .tint(CareLensTheme.Colors.goldLight)
         }
     }
 }

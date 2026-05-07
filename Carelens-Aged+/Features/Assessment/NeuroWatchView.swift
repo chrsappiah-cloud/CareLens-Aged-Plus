@@ -94,8 +94,9 @@ struct NeuroWatchView: View {
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
-                                    Color(red: 0.3, green: 0.95, blue: 0.85),
-                                    Color(red: 0.2, green: 0.55, blue: 1.0)
+                                    Color(red: 0.35, green: 0.40, blue: 0.90),
+                                    Color(red: 0.58, green: 0.35, blue: 0.82),
+                                    Color(red: 0.70, green: 0.50, blue: 0.30)
                                 ],
                                 startPoint: .top,
                                 endPoint: .bottom

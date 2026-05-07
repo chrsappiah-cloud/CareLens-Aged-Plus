@@ -241,51 +241,195 @@ struct ClientDetailView: View {
     }
 
     private var documentsTab: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "doc")
-                .font(.system(size: 40))
-                .foregroundStyle(CareLensTheme.Colors.textTertiary)
-            Text("No Documents")
-                .font(.headline)
-                .foregroundStyle(CareLensTheme.Colors.textPrimary)
-            Text("Generated reports will be stored here")
-                .font(.caption)
-                .foregroundStyle(CareLensTheme.Colors.textSecondary)
+        VStack(spacing: 16) {
+            SectionHeader(title: "Reports & Documents")
+
+            NavigationLink {
+                ReportsHomeView()
+            } label: {
+                DiamondGlassCard(title: "Generate Report", subtitle: "Clinical, Family, Facility, or ACP report", icon: "doc.richtext") {
+                    HStack {
+                        DiamondStatusChip(text: "4 types available", level: .safe)
+                        Spacer()
+                        Image(systemName: "chevron.right").foregroundStyle(CareLensTheme.Colors.textTertiary)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+
+            DiamondGlassCard(title: "Assessment Records", subtitle: "\(client.assessments.count) completed sessions", icon: "folder.fill") {
+                ForEach(client.assessments.prefix(3), id: \.id) { session in
+                    HStack(spacing: 8) {
+                        DiamondShape().fill(CareLensTheme.Colors.emeraldGreen).frame(width: 6, height: 6)
+                        Text(session.type)
+                            .font(.caption)
+                            .foregroundStyle(CareLensTheme.Colors.textPrimary)
+                        Spacer()
+                        Text(session.updatedAt.formatted(date: .abbreviated, time: .omitted))
+                            .font(.caption2)
+                            .foregroundStyle(CareLensTheme.Colors.textTertiary)
+                    }
+                }
+                if client.assessments.isEmpty {
+                    Text("No records yet").font(.caption).foregroundStyle(CareLensTheme.Colors.textTertiary)
+                }
+            }
+
+            DiamondGlassCard(title: "Care Plans", subtitle: "\(client.carePlans.count) plan(s) on file", icon: "cross.case.fill") {
+                HStack {
+                    DiamondStatusChip(text: client.carePlans.isEmpty ? "None" : "Active", level: client.carePlans.isEmpty ? .warning : .safe)
+                    Spacer()
+                    NavigationLink {
+                        CarePlanDetailView(client: client)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text("View")
+                            Image(systemName: "chevron.right")
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(CareLensTheme.Colors.goldPrimary)
+                    }
+                }
+            }
+
+            Button(action: {}) {
+                HStack {
+                    Image(systemName: "square.and.arrow.up")
+                    Text("Export All as PDF")
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(DiamondSecondaryButtonStyle())
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .padding()
     }
 
     private var timelineTab: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "clock")
-                .font(.system(size: 40))
-                .foregroundStyle(CareLensTheme.Colors.textTertiary)
-            Text("Timeline")
-                .font(.headline)
-                .foregroundStyle(CareLensTheme.Colors.textPrimary)
-            Text("Activity timeline coming soon")
-                .font(.caption)
-                .foregroundStyle(CareLensTheme.Colors.textSecondary)
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "Activity Timeline")
+
+            let allEvents = buildTimeline()
+            if allEvents.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "clock").font(.system(size: 40)).foregroundStyle(CareLensTheme.Colors.textTertiary)
+                    Text("No activity recorded yet").font(.subheadline).foregroundStyle(CareLensTheme.Colors.textSecondary)
+                }
+                .frame(maxWidth: .infinity).padding(.top, 40)
+            } else {
+                ForEach(allEvents, id: \.date) { event in
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(spacing: 0) {
+                            DiamondShape()
+                                .fill(event.color)
+                                .frame(width: 12, height: 12)
+                            Rectangle()
+                                .fill(Color.white.opacity(0.1))
+                                .frame(width: 1, height: 40)
+                        }
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(event.title)
+                                .font(.subheadline.bold())
+                                .foregroundStyle(CareLensTheme.Colors.textPrimary)
+                            Text(event.subtitle)
+                                .font(.caption)
+                                .foregroundStyle(CareLensTheme.Colors.textSecondary)
+                            Text(event.date.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(CareLensTheme.Colors.textTertiary)
+                        }
+                        Spacer()
+                    }
+                }
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .padding()
     }
 
     private var careCircleTab: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "person.3")
-                .font(.system(size: 40))
-                .foregroundStyle(CareLensTheme.Colors.textTertiary)
-            Text("Care Circle")
-                .font(.headline)
-                .foregroundStyle(CareLensTheme.Colors.textPrimary)
-            Text("Family, carers, and team members")
-                .font(.caption)
-                .foregroundStyle(CareLensTheme.Colors.textSecondary)
+        VStack(spacing: 16) {
+            SectionHeader(title: "Care Circle")
+
+            DiamondGlassCard(title: "Primary Contact", subtitle: client.nominatedDecisionMaker.isEmpty ? "Not specified" : client.nominatedDecisionMaker, icon: "person.fill") {
+                HStack {
+                    DiamondStatusChip(text: "Decision Maker", level: .safe)
+                    Spacer()
+                    Button(action: {}) {
+                        Image(systemName: "phone.fill")
+                            .foregroundStyle(CareLensTheme.Colors.emeraldGreen)
+                    }
+                }
+            }
+
+            DiamondGlassCard(title: "Referral Source", subtitle: client.referralSource.isEmpty ? "Unknown" : client.referralSource, icon: "arrow.turn.right.down") {
+                HStack {
+                    DiamondStatusChip(text: "Referring", level: .info)
+                    Spacer()
+                    Button(action: {}) {
+                        Image(systemName: "envelope.fill")
+                            .foregroundStyle(CareLensTheme.Colors.goldPrimary)
+                    }
+                }
+            }
+
+            DiamondGlassCard(title: "Care Team", subtitle: "Assigned professionals", icon: "person.3.fill") {
+                VStack(alignment: .leading, spacing: 8) {
+                    CareTeamMember(name: "Dr. Sarah Wilson", role: "Lead Clinician", isOnline: true)
+                    CareTeamMember(name: "James Kim", role: "Occupational Therapist", isOnline: true)
+                    CareTeamMember(name: "Nurse Chen", role: "Community Nurse", isOnline: false)
+                }
+            }
+
+            NavigationLink {
+                CollateralReportView(client: client)
+            } label: {
+                DiamondGlassCard(title: "Collateral Reports", subtitle: "Family/carer observations", icon: "text.bubble.fill") {
+                    HStack {
+                        DiamondStatusChip(text: "Submit Report", level: .safe)
+                        Spacer()
+                        Image(systemName: "chevron.right").foregroundStyle(CareLensTheme.Colors.textTertiary)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+
+            Button(action: {}) {
+                HStack {
+                    Image(systemName: "person.badge.plus")
+                    Text("Add Team Member")
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(DiamondSecondaryButtonStyle())
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .padding()
+    }
+
+    private struct TimelineEvent {
+        let title: String
+        let subtitle: String
+        let date: Date
+        let color: Color
+    }
+
+    private func buildTimeline() -> [TimelineEvent] {
+        var events: [TimelineEvent] = []
+        for assessment in client.assessments {
+            events.append(TimelineEvent(
+                title: assessment.type,
+                subtitle: "Assessment \(assessment.status)",
+                date: assessment.updatedAt,
+                color: CareLensTheme.Colors.emeraldGreen
+            ))
+        }
+        for event in client.monitoringEvents.prefix(10) {
+            events.append(TimelineEvent(
+                title: event.eventType,
+                subtitle: event.notes,
+                date: event.timestamp,
+                color: event.severity == "High" ? CareLensTheme.Colors.riskRed : CareLensTheme.Colors.goldPrimary
+            ))
+        }
+        return events.sorted { $0.date > $1.date }
     }
 }
 
@@ -297,8 +441,9 @@ struct SectionHeader: View {
             .foregroundStyle(
                 LinearGradient(
                     colors: [
-                        Color(red: 0.4, green: 0.85, blue: 0.9),
-                        Color(red: 0.3, green: 0.65, blue: 0.95)
+                        Color(red: 0.35, green: 0.40, blue: 0.88),
+                        Color(red: 0.60, green: 0.35, blue: 0.80),
+                        Color(red: 0.72, green: 0.50, blue: 0.32)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -339,5 +484,44 @@ struct AssessmentRow: View {
             StatusChip(title: assessment.status, color: assessment.assessmentStatus.color)
         }
         .clCard()
+    }
+}
+
+struct CareTeamMember: View {
+    let name: String
+    let role: String
+    let isOnline: Bool
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ZStack(alignment: .bottomTrailing) {
+                Circle()
+                    .fill(CareLensTheme.Colors.goldPrimary.opacity(0.15))
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Text(String(name.prefix(1)))
+                            .font(.caption.bold())
+                            .foregroundStyle(CareLensTheme.Colors.goldLight)
+                    )
+                Circle()
+                    .fill(isOnline ? CareLensTheme.Colors.safeGreen : Color.gray)
+                    .frame(width: 8, height: 8)
+                    .overlay(Circle().strokeBorder(Color.black, lineWidth: 1))
+            }
+            VStack(alignment: .leading, spacing: 1) {
+                Text(name)
+                    .font(.caption.bold())
+                    .foregroundStyle(CareLensTheme.Colors.textPrimary)
+                Text(role)
+                    .font(.caption2)
+                    .foregroundStyle(CareLensTheme.Colors.textTertiary)
+            }
+            Spacer()
+            if isOnline {
+                DiamondShape()
+                    .fill(CareLensTheme.Colors.safeGreen)
+                    .frame(width: 6, height: 6)
+            }
+        }
     }
 }

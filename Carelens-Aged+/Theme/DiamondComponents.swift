@@ -102,8 +102,9 @@ struct DiamondGlassCard<Content: View>: View {
                             .foregroundStyle(
                                 LinearGradient(
                                     colors: [
-                                        CareLensTheme.Colors.goldLight,
-                                        CareLensTheme.Colors.emeraldGreen
+                                        Color(red: 0.40, green: 0.45, blue: 0.92),
+                                        Color(red: 0.65, green: 0.38, blue: 0.85),
+                                        Color(red: 0.75, green: 0.55, blue: 0.30)
                                     ],
                                     startPoint: .leading,
                                     endPoint: .trailing
@@ -112,8 +113,8 @@ struct DiamondGlassCard<Content: View>: View {
                             .lineLimit(2)
                         if let subtitle {
                             Text(subtitle)
-                                .font(.subheadline)
-                                .foregroundColor(CareLensTheme.Colors.textSecondary)
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(Color.white.opacity(0.80))
                                 .lineLimit(2)
                         }
                     }
@@ -171,11 +172,11 @@ struct DiamondStatusChip: View {
                 .frame(width: 12, height: 12)
                 .shadow(color: .white.opacity(0.4), radius: 4, x: 0, y: 2)
             Text(text)
-                .foregroundColor(.white.opacity(0.85))
-                .font(.caption.weight(.medium))
+                .foregroundColor(.white)
+                .font(.caption.weight(.bold))
         }
-        .padding(.vertical, 4)
-        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .padding(.horizontal, 11)
         .background(
             Capsule()
                 .fill(Color.white.opacity(0.08))
@@ -248,17 +249,23 @@ struct DiamondButtonStyle: ButtonStyle {
 struct DiamondSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.subheadline.weight(.semibold))
-            .foregroundColor(CareLensTheme.Colors.accentMint)
+            .font(.subheadline.weight(.bold))
+            .foregroundColor(.white)
             .padding(.vertical, 12)
             .padding(.horizontal, 18)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(CareLensTheme.Colors.accentMint.opacity(0.12))
+                    .fill(Color.white.opacity(0.10))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(CareLensTheme.Colors.accentMint.opacity(0.4), lineWidth: 1)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [CareLensTheme.Colors.goldPrimary.opacity(0.6), CareLensTheme.Colors.emeraldGreen.opacity(0.4)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.2
+                    )
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.22, dampingFraction: 0.75), value: configuration.isPressed)
