@@ -15,39 +15,10 @@ env:
   DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
 
 jobs:
-  resolve-simulator:
-    name: Resolve iOS Simulator
-    runs-on: macos-15
-    timeout-minutes: 25
-    outputs:
-      destination: ${{ steps.sim.outputs.destination }}
-    steps:
-      - name: Download iOS Simulator platform
-        run: xcodebuild -downloadPlatform iOS
-
-      - name: Pick available iPhone simulator
-        id: sim
-        run: |
-          set -e
-          xcrun simctl list devices available > /tmp/sim-devices.txt
-          DEVICE_ID=$(grep -E "iPhone.*\(Booted\)" /tmp/sim-devices.txt | head -1 | grep -oE '[A-F0-9-]{36}' | head -1 || true)
-          if [ -z "$DEVICE_ID" ]; then
-            DEVICE_ID=$(grep -E "^\s+iPhone" /tmp/sim-devices.txt | head -1 | grep -oE '[A-F0-9-]{36}' | head -1)
-          fi
-          if [ -z "$DEVICE_ID" ]; then
-            echo "No iPhone simulator found after iOS platform download"
-            cat /tmp/sim-devices.txt
-            exit 1
-          fi
-          xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
-          echo "destination=platform=iOS Simulator,id=$DEVICE_ID" >> "$GITHUB_OUTPUT"
-          echo "Using simulator: $DEVICE_ID"
-
   build-and-test:
     name: Build & Unit Tests
     runs-on: macos-15
-    needs: resolve-simulator
-    timeout-minutes: 35
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -65,13 +36,16 @@ jobs:
       - name: Resolve dependencies
         run: xcodebuild -resolvePackageDependencies -project "Carelens-Aged+.xcodeproj" -scheme "Carelens-Aged+"
 
+      - name: Prepare iOS Simulator
+        run: bash scripts/ci_prepare_ios_simulator.sh
+
       - name: Build for testing
         run: |
           set -o pipefail
           xcodebuild build-for-testing \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "${{ needs.resolve-simulator.outputs.destination }}" \
+            -destination "$SIM_DESTINATION" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
@@ -82,7 +56,7 @@ jobs:
           xcodebuild test-without-building \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "${{ needs.resolve-simulator.outputs.destination }}" \
+            -destination "$SIM_DESTINATION" \
             -only-testing:"Carelens-Aged+Tests" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
@@ -99,7 +73,7 @@ jobs:
   ui-tests:
     name: UI Tests
     runs-on: macos-15
-    needs: [resolve-simulator, build-and-test]
+    needs: build-and-test
     timeout-minutes: 45
 
     steps:
@@ -112,13 +86,16 @@ jobs:
       - name: Install xcbeautify
         run: brew install xcbeautify || true
 
+      - name: Prepare iOS Simulator
+        run: bash scripts/ci_prepare_ios_simulator.sh
+
       - name: Build for testing
         run: |
           set -o pipefail
           xcodebuild build-for-testing \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "${{ needs.resolve-simulator.outputs.destination }}" \
+            -destination "$SIM_DESTINATION" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
@@ -129,7 +106,7 @@ jobs:
           xcodebuild test-without-building \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "${{ needs.resolve-simulator.outputs.destination }}" \
+            -destination "$SIM_DESTINATION" \
             -only-testing:"Carelens-Aged+UITests/Carelens_Aged_UITests" \
             -skip-testing:"Carelens-Aged+UITests/Carelens_Aged_ScreenshotTests" \
             -resultBundlePath UITestResults.xcresult \
@@ -179,7 +156,7 @@ jobs:
   deploy-testflight:
     name: Deploy to TestFlight
     runs-on: macos-15
-    needs: [resolve-simulator, build-and-test, ui-tests, code-quality]
+    needs: [build-and-test, ui-tests, code-quality]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     timeout-minutes: 45
     environment: production
