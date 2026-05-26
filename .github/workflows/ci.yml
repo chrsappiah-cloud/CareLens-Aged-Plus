@@ -13,6 +13,8 @@ concurrency:
 
 env:
   DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+  # GHA runners may not ship iOS 26.x simulator runtimes; align with downloaded platform.
+  IPHONEOS_DEPLOYMENT_TARGET: "18.0"
 
 jobs:
   build-and-test:
@@ -47,6 +49,7 @@ jobs:
             -scheme "Carelens-Aged+" \
             -destination "$SIM_DESTINATION" \
             -configuration Debug \
+            IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
@@ -59,6 +62,7 @@ jobs:
             -destination "$SIM_DESTINATION" \
             -only-testing:"Carelens-Aged+Tests" \
             -resultBundlePath TestResults.xcresult \
+            IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
@@ -97,6 +101,7 @@ jobs:
             -scheme "Carelens-Aged+" \
             -destination "$SIM_DESTINATION" \
             -configuration Debug \
+            IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
@@ -110,6 +115,7 @@ jobs:
             -only-testing:"Carelens-Aged+UITests/Carelens_Aged_UITests" \
             -skip-testing:"Carelens-Aged+UITests/Carelens_Aged_ScreenshotTests" \
             -resultBundlePath UITestResults.xcresult \
+            IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
