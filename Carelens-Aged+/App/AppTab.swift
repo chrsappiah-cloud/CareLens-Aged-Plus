@@ -78,6 +78,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
         "Opens \(screenTitle). \(subtitle)"
     }
 
+    @MainActor
     func isVisible(for auth: AuthenticationService) -> Bool {
         switch self {
         case .home, .clients, .admit, .settings:
