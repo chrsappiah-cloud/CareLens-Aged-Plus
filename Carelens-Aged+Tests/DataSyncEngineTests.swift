@@ -17,7 +17,7 @@ struct SupabasePrimaryServiceTests {
     @Test func fullSyncWritesAllRecordTypes() async throws {
         let service = SupabasePrimaryService(config: SupabaseConfig(projectURL: "https://test.local", anonKey: "test"))
         let client = ClientProfile(firstName: "A", lastName: "B", dateOfBirth: .now)
-        let assessment = AssessmentSession(clientID: client.id, type: "NeuroWatch", status: "Draft", assessorRole: "Clinician")
+        let assessment = AssessmentSession(clientID: client.id, assessmentType: "NeuroWatch", status: "Draft", assessorRole: "Clinician")
         let plan = CarePlan(clientID: client.id)
         try await service.performFullSync(clients: [client], assessments: [assessment], plans: [plan])
         #expect(try await service.fetchAll(type: .client).count == 1)

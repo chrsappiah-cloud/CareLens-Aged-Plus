@@ -9,7 +9,7 @@ final class ReportServiceTests: XCTestCase {
     func testClinicalReport() {
         let svc = ReportService()
         let c = ClientProfile(firstName: "Jane", lastName: "Doe", dateOfBirth: Calendar.current.date(byAdding: .year, value: -80, to: .now)!)
-        let a = AssessmentSession(clientID: c.id, type: "NeuroWatch", status: "Completed", assessorRole: "Clinician")
+        let a = AssessmentSession(clientID: c.id, assessmentType: "NeuroWatch", status: "Completed", assessorRole: "Clinician")
         a.cognitionScore = 4.0
         a.moodScore = 3.0
         let r = svc.generateReport(type: .clinical, client: c, assessment: a, carePlan: nil)

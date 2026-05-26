@@ -5,7 +5,7 @@ import SwiftData
 final class AssessmentSession {
     @Attribute(.unique) var id: String
     var clientID: String
-    var type: String
+    var assessmentType: String
     var status: String
     var assessorRole: String
     var createdAt: Date
@@ -33,7 +33,7 @@ final class AssessmentSession {
     init(
         id: String = UUID().uuidString,
         clientID: String,
-        type: String,
+        assessmentType: String,
         status: String = "Draft",
         assessorRole: String = "Social Worker",
         createdAt: Date = .now,
@@ -41,7 +41,7 @@ final class AssessmentSession {
     ) {
         self.id = id
         self.clientID = clientID
-        self.type = type
+        self.assessmentType = assessmentType
         self.status = status
         self.assessorRole = assessorRole
         self.createdAt = createdAt

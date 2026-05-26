@@ -16,7 +16,7 @@ final class E2ESupabasePrimaryServiceTests: XCTestCase {
     func testFullSync() async throws {
         let s = SupabasePrimaryService(config: SupabaseConfig(projectURL: "https://test.local", anonKey: "test"))
         let c = ClientProfile(firstName: "A", lastName: "B", dateOfBirth: .now)
-        let a = AssessmentSession(clientID: c.id, type: "NW", status: "Draft", assessorRole: "C")
+        let a = AssessmentSession(clientID: c.id, assessmentType: "NW", status: "Draft", assessorRole: "C")
         let p = CarePlan(clientID: c.id)
         try await s.performFullSync(clients: [c], assessments: [a], plans: [p])
         let clients = try await s.fetchAll(type: .client)

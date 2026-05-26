@@ -168,7 +168,7 @@ struct BiopsychosocialIntakeView: View {
     private func saveDraft() {
         let assessment = AssessmentSession(
             clientID: client.id,
-            type: moduleName,
+            assessmentType: moduleName,
             status: "Draft",
             assessorRole: "Social Worker"
         )
@@ -178,7 +178,7 @@ struct BiopsychosocialIntakeView: View {
     private func completeAssessment() {
         let assessment = AssessmentSession(
             clientID: client.id,
-            type: moduleName,
+            assessmentType: moduleName,
             status: "Completed",
             assessorRole: "Social Worker"
         )

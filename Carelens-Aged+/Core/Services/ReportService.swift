@@ -46,7 +46,7 @@ final class ReportService {
         ASSESSMENT SUMMARY
         ──────────────────────────────────────────
         
-        Assessment Type: \(assessment?.type ?? "N/A")
+        Assessment Type: \(assessment?.assessmentType ?? "N/A")
         Assessor Role: \(assessment?.assessorRole ?? "N/A")
         Status: \(assessment?.status ?? "N/A")
         Date: \(assessment?.createdAt.formatted(date: .abbreviated, time: .shortened) ?? "N/A")

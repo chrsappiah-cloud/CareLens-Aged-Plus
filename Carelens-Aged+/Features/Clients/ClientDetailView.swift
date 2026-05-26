@@ -93,7 +93,7 @@ struct ClientDetailView: View {
                 subtitle: "Early cognitive change index",
                 icon: "brain.head.profile"
             ) {
-                if let latestCognition = client.assessments.first(where: { $0.type == "Cognition & Dementia" }) {
+                if let latestCognition = client.assessments.first(where: { $0.assessmentType == "Cognition & Dementia" }) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             let band = bandForScore(latestCognition.cognitionScore)
@@ -260,7 +260,7 @@ struct ClientDetailView: View {
                 ForEach(client.assessments.prefix(3), id: \.id) { session in
                     HStack(spacing: 8) {
                         DiamondShape().fill(CareLensTheme.Colors.emeraldGreen).frame(width: 6, height: 6)
-                        Text(session.type)
+                        Text(session.assessmentType)
                             .font(.caption)
                             .foregroundStyle(CareLensTheme.Colors.textPrimary)
                         Spacer()
@@ -414,7 +414,7 @@ struct ClientDetailView: View {
         var events: [TimelineEvent] = []
         for assessment in client.assessments {
             events.append(TimelineEvent(
-                title: assessment.type,
+                title: assessment.assessmentType,
                 subtitle: "Assessment \(assessment.status)",
                 date: assessment.updatedAt,
                 color: CareLensTheme.Colors.emeraldGreen
@@ -472,7 +472,7 @@ struct AssessmentRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(assessment.type)
+                Text(assessment.assessmentType)
                     .font(.subheadline.bold())
                     .foregroundStyle(CareLensTheme.Colors.textPrimary)
                 Text(assessment.createdAt.formatted(date: .abbreviated, time: .omitted))

@@ -207,7 +207,7 @@ struct NeuroWatchView: View {
     private func saveDraft() {
         let assessment = AssessmentSession(
             clientID: client.id,
-            type: "Cognition & Dementia",
+            assessmentType: "Cognition & Dementia",
             status: "Draft",
             assessorRole: "Social Worker"
         )

@@ -56,7 +56,11 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgumentsEnv = "YES"
       shouldUseLaunchSchemeArgsEnv = "NO"
-      shouldAutocreateTestPlan = "YES">
+      shouldAutocreateTestPlan = "NO">
+      <TestPlanReference
+         reference = "container:E2ETests.xctestplan"
+         default = "YES">
+      </TestPlanReference>
       <Testables>
          <TestableReference
             skipped = "NO"

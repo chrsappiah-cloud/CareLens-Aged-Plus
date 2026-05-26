@@ -70,7 +70,7 @@ struct DashboardView: View {
                 }
             } else {
                 ForEach(urgentAssessments, id: \.id) { assessment in
-                    DiamondGlassCard(title: assessment.type, subtitle: "Client: \(assessment.clientID)", icon: "exclamationmark.circle.fill") {
+                    DiamondGlassCard(title: assessment.assessmentType, subtitle: "Client: \(assessment.clientID)", icon: "exclamationmark.circle.fill") {
                         DiamondStatusChip(text: "Urgent", level: .risk)
                     }
                 }

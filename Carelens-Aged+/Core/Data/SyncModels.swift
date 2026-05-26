@@ -123,7 +123,7 @@ extension SyncRecord {
             recordType: .assessment,
             payload: [
                 "clientID": .string(assessment.clientID),
-                "type": .string(assessment.type),
+                "type": .string(assessment.assessmentType),
                 "status": .string(assessment.status),
                 "assessorRole": .string(assessment.assessorRole),
                 "cognitionScore": assessment.cognitionScore.map { .double($0) } ?? .null,

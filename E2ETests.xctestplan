@@ -1,0 +1,52 @@
+{
+  "configurations" : [
+    {
+      "id" : "BFCDB45C-F63B-41F7-9379-0ED321E3651C",
+      "name" : "Configuration 1",
+      "options" : {
+        
+      }
+    }
+  ],
+  "defaultTestExecutionOrder" : "random",
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Carelens-Aged+.xcodeproj",
+        "identifier" : "5E78E93F2FABF097009EA354",
+        "name" : "Carelens-Aged+Tests"
+      },
+      "selectedTests" : [
+        "Carelens_Aged_Tests/E2ESubscriptionTierTests",
+        "Carelens_Aged_Tests/E2EAppFeatureTests",
+        "Carelens_Aged_Tests/E2EUserRoleTests",
+        "Carelens_Aged_Tests/E2EAssessmentStatusTests",
+        "Carelens_Aged_Tests/E2EMonitoringEventTypeTests",
+        "Carelens_Aged_Tests/E2ENeuroWatchBandTests",
+        "Carelens_Aged_Tests/E2ESubscriptionProductTests",
+        "Carelens_Aged_Tests/E2EReportTypeTests",
+        "Carelens_Aged_Tests/E2ECKZoneNameTests",
+        "Carelens_Aged_Tests/E2ESyncModelTests",
+        "Carelens_Aged_Tests/ClientProfileTests",
+        "Carelens_Aged_Tests/AssessmentSessionTests",
+        "Carelens_Aged_Tests/AssessmentSectionTests",
+        "Carelens_Aged_Tests/CarePlanTests",
+        "Carelens_Aged_Tests/MonitoringEventTests",
+        "Carelens_Aged_Tests/AuthenticationServiceTests",
+        "Carelens_Aged_Tests/E2ESubscriptionMgrTests",
+        "Carelens_Aged_Tests/E2ENeuroWatchEngineTests",
+        "Carelens_Aged_Tests/E2EHealthAPIServiceTests",
+        "Carelens_Aged_Tests/E2ENetworkMiddlewareTests",
+        "Carelens_Aged_Tests/E2ESupabasePrimaryServiceTests",
+        "Carelens_Aged_Tests/E2ECloudflareBackupServiceTests",
+        "Carelens_Aged_Tests/E2EDataSyncEngineTests",
+        "Carelens_Aged_Tests/E2EApplePaySubscriptionTests",
+        "Carelens_Aged_Tests/ReportServiceTests",
+        "Carelens_Aged_Tests/AppEnvironmentTests",
+        "Carelens_Aged_Tests/RepositoriesProtocolTests",
+        "Carelens_Aged_Tests/ThemeUnitTests"
+      ]
+    }
+  ],
+  "version" : 1
+}

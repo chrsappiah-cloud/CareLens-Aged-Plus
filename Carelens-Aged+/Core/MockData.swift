@@ -55,7 +55,7 @@ enum MockData {
         // Assessments for client 1
         let assessment1 = AssessmentSession(
             clientID: client1.id,
-            type: "Cognition & Dementia",
+            assessmentType: "Cognition & Dementia",
             status: "Completed",
             assessorRole: "Social Worker"
         )
@@ -68,7 +68,7 @@ enum MockData {
 
         let assessment2 = AssessmentSession(
             clientID: client1.id,
-            type: "Biopsychosocial Intake",
+            assessmentType: "Biopsychosocial Intake",
             status: "In Progress",
             assessorRole: "Social Worker"
         )
@@ -78,7 +78,7 @@ enum MockData {
         // Assessment for client 2
         let assessment3 = AssessmentSession(
             clientID: client2.id,
-            type: "Mood, Anxiety & Delirium",
+            assessmentType: "Mood, Anxiety & Delirium",
             status: "Needs Review",
             assessorRole: "Nurse"
         )

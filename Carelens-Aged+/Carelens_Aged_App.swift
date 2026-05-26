@@ -4,19 +4,14 @@ import SwiftData
 @main
 struct Carelens_Aged_App: App {
     var sharedModelContainer: ModelContainer = {
-        do {
-            let schema = Schema([
-                ClientProfile.self,
-                AssessmentSession.self,
-                AssessmentSection.self,
-                CarePlan.self,
-                MonitoringEvent.self,
-            ])
-            let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("CarelensApp ModelContainer: \(error)")
-        }
+        print("[CarelensAged] Creating ModelContainer...")
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(
+            for: ClientProfile.self, AssessmentSession.self, AssessmentSection.self, CarePlan.self, MonitoringEvent.self,
+            configurations: config
+        )
+        print("[CarelensAged] ModelContainer created successfully!")
+        return container
     }()
 
     @StateObject private var authService = AuthenticationService.shared

@@ -28,21 +28,21 @@ final class ClientProfileTests: XCTestCase {
 
 final class AssessmentSessionTests: XCTestCase {
     func testCreation() {
-        let a = AssessmentSession(clientID: "c1", type: "NeuroWatch", status: "Draft", assessorRole: "Clinician")
+        let a = AssessmentSession(clientID: "c1", assessmentType: "NeuroWatch", status: "Draft", assessorRole: "Clinician")
         XCTAssertEqual(a.clientID, "c1")
-        XCTAssertEqual(a.assessmentStatus, .draft)
+        XCTAssertEqual(a.assessmentStatus, AssessmentStatus.draft)
         XCTAssertNil(a.cognitionScore)
     }
     func testStatusMapping() {
-        let a = AssessmentSession(clientID: "c1", type: "T", status: "Completed", assessorRole: "SW")
-        XCTAssertEqual(a.assessmentStatus, .completed)
-        let b = AssessmentSession(clientID: "c2", type: "T", status: "Urgent", assessorRole: "SW")
-        XCTAssertEqual(b.assessmentStatus, .urgent)
-        let c = AssessmentSession(clientID: "c3", type: "T", status: "Invalid", assessorRole: "SW")
-        XCTAssertEqual(c.assessmentStatus, .draft)
+        let a = AssessmentSession(clientID: "c1", assessmentType: "T", status: "Completed", assessorRole: "SW")
+        XCTAssertEqual(a.assessmentStatus, AssessmentStatus.completed)
+        let b = AssessmentSession(clientID: "c2", assessmentType: "T", status: "Urgent", assessorRole: "SW")
+        XCTAssertEqual(b.assessmentStatus, AssessmentStatus.urgent)
+        let c = AssessmentSession(clientID: "c3", assessmentType: "T", status: "Invalid", assessorRole: "SW")
+        XCTAssertEqual(c.assessmentStatus, AssessmentStatus.draft)
     }
     func testScoresDefaultNil() {
-        let a = AssessmentSession(clientID: "c1", type: "T", status: "Draft", assessorRole: "Dr")
+        let a = AssessmentSession(clientID: "c1", assessmentType: "T", status: "Draft", assessorRole: "Dr")
         XCTAssertNil(a.moodScore)
         XCTAssertNil(a.anxietyScore)
         XCTAssertNil(a.adlScore)

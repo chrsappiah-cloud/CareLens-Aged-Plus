@@ -111,7 +111,7 @@ actor CloudKitManager {
         let record = CKRecord(recordType: CKRecordType.assessment.rawValue, recordID: recordID)
 
         record["clientID"] = assessment.clientID
-        record["type"] = assessment.type
+        record["type"] = assessment.assessmentType
         record["status"] = assessment.status
         record["assessorRole"] = assessment.assessorRole
         record["cognitionScore"] = assessment.cognitionScore
