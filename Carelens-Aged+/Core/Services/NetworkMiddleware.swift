@@ -27,12 +27,16 @@ class NetworkMiddleware: ObservableObject {
     static let shared = NetworkMiddleware()
 
     @Published var isConnected = true
-    @Published var lastSyncTime: Date? = .now
+    @Published var lastSyncTime: Date?
     @Published var pendingRequests = 0
+    @Published var lastSyncPipeline: SyncPipelineResult?
 
     private let healthAPI = HealthAPIService()
-    private let cloudKit = CloudKitManager()
-    private let supabase = SupabaseBackupService()
+
+    /// Created only when sync runs — avoids CloudKit init during lightweight middleware tests.
+    private var syncEngine: DataSyncEngine {
+        DataSyncEngine.shared
+    }
 
     func requestInsight(
         for endpoint: APIEndpoint,
@@ -87,32 +91,36 @@ class NetworkMiddleware: ObservableObject {
         )
     }
 
+    /// End-to-end sync: Supabase primary → CloudKit → Cloudflare.
     func syncData(
         clients: [ClientProfile],
         assessments: [AssessmentSession],
         plans: [CarePlan],
         userTier: SubscriptionTier
     ) async throws {
-        guard SubscriptionManager.shared.canAccess(feature: .cloudSync, tier: userTier) else {
+        guard SubscriptionManager.shared.canAccess(feature: .supabasePrimary, tier: userTier) else {
             throw MiddlewareError.featureNotAvailable
         }
 
         pendingRequests += 1
         defer { pendingRequests -= 1 }
 
-        try await cloudKit.performFullSync(
-            localClients: clients,
-            localAssessments: assessments,
-            localPlans: plans
-        )
-        lastSyncTime = .now
+        let enableCloudKit = SubscriptionManager.shared.canAccess(feature: .cloudSync, tier: userTier)
+        let enableCloudflare = SubscriptionManager.shared.canAccess(feature: .cloudflareBackup, tier: userTier)
 
-        if SubscriptionManager.shared.canAccess(feature: .supabaseBackup, tier: userTier) {
-            try await supabase.performFullBackup(
-                clients: clients,
-                assessments: assessments,
-                plans: plans
-            )
+        let result = await syncEngine.performEndToEndSync(
+            clients: clients,
+            assessments: assessments,
+            plans: plans,
+            enableCloudKit: enableCloudKit,
+            enableCloudflare: enableCloudflare
+        )
+
+        lastSyncPipeline = result
+        lastSyncTime = result.completedAt
+
+        guard result.primarySucceeded else {
+            throw MiddlewareError.serverError(result.primary.errorMessage ?? "Primary sync failed")
         }
     }
 

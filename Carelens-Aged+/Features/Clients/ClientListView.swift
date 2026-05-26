@@ -18,6 +18,12 @@ struct ClientListView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 12) {
+                    ScreenIntroHeader(
+                        title: AppTab.clients.screenTitle,
+                        subtitle: AppTab.clients.subtitle
+                    )
+                    .padding(.horizontal)
+
                     ForEach(filteredClients, id: \.id) { client in
                         NavigationLink(destination: ClientDetailView(client: client)) {
                             ClientRow(client: client)
@@ -29,10 +35,10 @@ struct ClientListView: View {
                 .padding(.top, 8)
             }
             .background(Color.clear)
-            .searchable(text: $searchText, prompt: "Search clients")
-            .navigationTitle("Clients")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .searchable(text: $searchText, prompt: "Search by name or ID")
+            .navigationTitle(AppTab.clients.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: { showingAddClient = true }) {
@@ -50,12 +56,13 @@ struct ClientListView: View {
                         Image(systemName: "person.2.slash")
                             .font(.system(size: 48))
                             .foregroundStyle(CareLensTheme.Colors.textTertiary)
-                        Text("No Clients")
+                        Text("No Clients Yet")
                             .font(.title3.bold())
                             .foregroundStyle(CareLensTheme.Colors.textPrimary)
-                        Text("Add your first client to begin assessment")
+                        Text("Tap + to add a client, or use the Admit tab for full intake")
                             .font(.subheadline)
                             .foregroundStyle(CareLensTheme.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
                     }
                 }
             }

@@ -19,8 +19,7 @@ struct UserAccessPanelView: View {
             }
             .background(Color.clear)
             .navigationTitle("My Access")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .careLensDarkChrome()
         }
     }
 

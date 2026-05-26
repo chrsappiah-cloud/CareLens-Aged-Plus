@@ -18,18 +18,28 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testLoginScreenAppears() throws {
-        XCTAssertTrue(app.staticTexts["CareLens Age+"].exists)
-        XCTAssertTrue(app.staticTexts["Aged Care Assessment Platform"].exists)
+        XCTAssertTrue(app.staticTexts["CareLens Aged+"].exists)
+        XCTAssertTrue(app.staticTexts["Intelligent aged care for clinicians & care teams"].exists)
+    }
+
+    /// Smoke test for deep-dark theme: primary actions remain visible on login.
+    @MainActor
+    func testDarkThemeLoginControlsVisible() throws {
+        XCTAssertTrue(app.staticTexts["CareLens Aged+"].waitForExistence(timeout: 5))
+        let signIn = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Sign In'")).firstMatch
+        XCTAssertTrue(signIn.waitForExistence(timeout: 5))
+        XCTAssertTrue(signIn.isHittable)
+        XCTAssertTrue(app.staticTexts["Quick demo sign-in"].exists)
     }
 
     @MainActor
     func testDemoCredentialButtonsExist() throws {
-        XCTAssertTrue(app.staticTexts["Demo Credentials"].exists)
+        XCTAssertTrue(app.staticTexts["Quick demo sign-in"].exists)
     }
 
     @MainActor
     func testSignInButtonExists() throws {
-        XCTAssertTrue(app.buttons["Sign In"].exists || app.buttons.matching(NSPredicate(format: "label CONTAINS 'Sign In'")).count > 0)
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS 'Sign In'")).count > 0)
     }
 
     @MainActor
@@ -43,7 +53,7 @@ final class Carelens_Aged_UITests: XCTestCase {
         if signInButton.exists && signInButton.isEnabled {
             signInButton.tap()
             sleep(2)
-            let dashboardTab = app.tabBars.buttons["Dashboard"]
+            let dashboardTab = app.tabBars.buttons["Home"]
             XCTAssertTrue(dashboardTab.waitForExistence(timeout: 5))
         }
     }
@@ -59,7 +69,7 @@ final class Carelens_Aged_UITests: XCTestCase {
         if signInButton.exists && signInButton.isEnabled {
             signInButton.tap()
             sleep(2)
-            let dashboardTab = app.tabBars.buttons["Dashboard"]
+            let dashboardTab = app.tabBars.buttons["Home"]
             XCTAssertTrue(dashboardTab.waitForExistence(timeout: 5))
         }
     }
@@ -73,7 +83,7 @@ final class Carelens_Aged_UITests: XCTestCase {
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
 
-        let expectedTabs = ["Dashboard", "Intake", "Clients", "Assess", "Settings"]
+        let expectedTabs = ["Home", "Clients", "Admit", "Assess", "Plans", "Reports", "Settings"]
         for tab in expectedTabs {
             let tabButton = tabBar.buttons[tab]
             if tabButton.exists {
@@ -84,17 +94,20 @@ final class Carelens_Aged_UITests: XCTestCase {
     }
 
     @MainActor
-    func testAdminTabVisibleForAdmin() throws {
+    func testAdminPanelInSettingsForAdmin() throws {
         loginAsAdmin()
-        let adminTab = app.tabBars.buttons["Admin"]
-        XCTAssertTrue(adminTab.waitForExistence(timeout: 5))
+        let settingsTab = app.tabBars.buttons["Settings"]
+        XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
+        settingsTab.tap()
+        sleep(1)
+        XCTAssertTrue(app.staticTexts["Facility Admin Panel"].waitForExistence(timeout: 5))
     }
 
     @MainActor
-    func testIntakeTabExists() throws {
+    func testAdmitTabExists() throws {
         loginAsAdmin()
-        let intakeTab = app.tabBars.buttons["Intake"]
-        XCTAssertTrue(intakeTab.waitForExistence(timeout: 5))
+        let admitTab = app.tabBars.buttons["Admit"]
+        XCTAssertTrue(admitTab.waitForExistence(timeout: 5))
     }
 
     // MARK: - Dashboard Tests
@@ -102,7 +115,7 @@ final class Carelens_Aged_UITests: XCTestCase {
     @MainActor
     func testDashboardLoads() throws {
         loginAsAdmin()
-        let dashboardTab = app.tabBars.buttons["Dashboard"]
+        let dashboardTab = app.tabBars.buttons["Home"]
         dashboardTab.tap()
         sleep(1)
         XCTAssertTrue(app.navigationBars.firstMatch.exists || app.staticTexts.count > 0)
@@ -113,7 +126,7 @@ final class Carelens_Aged_UITests: XCTestCase {
     @MainActor
     func testIntakeFormNavigation() throws {
         loginAsAdmin()
-        let intakeTab = app.tabBars.buttons["Intake"]
+        let intakeTab = app.tabBars.buttons["Admit"]
         if intakeTab.exists {
             intakeTab.tap()
             sleep(1)

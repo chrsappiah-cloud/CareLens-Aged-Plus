@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5E78E92F2FABF095009EA354 /* Carelens-Aged+.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Carelens-Aged+.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E78E92F2FABF095009EA354 /* CarelensAged.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarelensAged.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E78E9402FABF097009EA354 /* Carelens-Aged+Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Carelens-Aged+Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E78E94A2FABF097009EA354 /* Carelens-Aged+UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Carelens-Aged+UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -98,7 +98,7 @@
 		5E78E9302FABF095009EA354 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5E78E92F2FABF095009EA354 /* Carelens-Aged+.app */,
+				5E78E92F2FABF095009EA354 /* CarelensAged.app */,
 				5E78E9402FABF097009EA354 /* Carelens-Aged+Tests.xctest */,
 				5E78E94A2FABF097009EA354 /* Carelens-Aged+UITests.xctest */,
 			);
@@ -127,7 +127,7 @@
 			packageProductDependencies = (
 			);
 			productName = "Carelens-Aged+";
-			productReference = 5E78E92F2FABF095009EA354 /* Carelens-Aged+.app */;
+			productReference = 5E78E92F2FABF095009EA354 /* CarelensAged.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5E78E93F2FABF097009EA354 /* Carelens-Aged+Tests */ = {
@@ -184,7 +184,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2640;
-				LastUpgradeCheck = 2640;
+				LastUpgradeCheck = 2650;
 				ORGANIZATIONNAME = wcs;
 				TargetAttributes = {
 					5E78E92E2FABF095009EA354 = {
@@ -290,13 +290,18 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Carelens-Aged+/Carelens_Aged_.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Carelens-Aged+/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "CareLens-Aged+";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.medical";
+				INFOPLIST_KEY_NSCameraUsageDescription = "CareLens uses the camera only when you attach clinical photos to a client record.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "CareLens can read health data you choose to link for monitoring insights.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CareLens can write health metrics you approve for longitudinal monitoring.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "CareLens accesses your photo library when you attach images to assessments.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -326,13 +331,18 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Carelens-Aged+/Carelens_Aged_.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Carelens-Aged+/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "CareLens-Aged+";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.medical";
+				INFOPLIST_KEY_NSCameraUsageDescription = "CareLens uses the camera only when you attach clinical photos to a client record.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "CareLens can read health data you choose to link for monitoring insights.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CareLens can write health metrics you approve for longitudinal monitoring.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "CareLens accesses your photo library when you attach images to assessments.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -414,6 +424,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -471,6 +482,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -494,7 +506,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Carelens-Aged+.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Carelens-Aged+";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarelensAged.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CarelensAged";
 			};
 			name = Debug;
 		};
@@ -516,7 +528,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Carelens-Aged+.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Carelens-Aged+";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarelensAged.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CarelensAged";
 			};
 			name = Release;
 		};

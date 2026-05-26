@@ -24,22 +24,42 @@ enum CKRecordType: String {
     case spiritualProfile = "CKSpiritualProfile"
 }
 
-actor CloudKitManager {
-    private let container: CKContainer
-    private let privateDatabase: CKDatabase
+enum CloudKitError: Error, LocalizedError {
+    case disabled
 
-    init(containerIdentifier: String = "iCloud.com.carelens.agedplus") {
-        self.container = CKContainer(identifier: containerIdentifier)
-        self.privateDatabase = container.privateCloudDatabase
+    var errorDescription: String? {
+        "iCloud / CloudKit is not available in this environment."
+    }
+}
+
+actor CloudKitManager {
+    private let privateDatabase: CKDatabase?
+    let isEnabled: Bool
+
+    init(containerIdentifier: String = AppEnvironment.cloudKitContainerID) {
+        isEnabled = AppEnvironment.shouldUseCloudKit
+        if isEnabled {
+            let container = CKContainer(identifier: containerIdentifier)
+            privateDatabase = container.privateCloudDatabase
+        } else {
+            privateDatabase = nil
+        }
+    }
+
+    private func requireDatabase() throws -> CKDatabase {
+        guard let privateDatabase else { throw CloudKitError.disabled }
+        return privateDatabase
     }
 
     // MARK: - Zone Management
 
     func createCustomZones() async throws {
+        guard isEnabled else { return }
+        let db = try requireDatabase()
         let zones = CKZoneName.allCases.map { CKRecordZone(zoneName: $0.rawValue) }
         for zone in zones {
             do {
-                _ = try await privateDatabase.save(zone)
+                _ = try await db.save(zone)
             } catch let error as CKError where error.code == .serverRecordChanged {
                 continue
             }
@@ -49,6 +69,7 @@ actor CloudKitManager {
     // MARK: - Client Operations
 
     func saveClient(_ client: ClientProfile) async throws {
+        let db = try requireDatabase()
         let zoneID = CKRecordZone.ID(zoneName: CKZoneName.clients.rawValue)
         let recordID = CKRecord.ID(recordName: client.id, zoneID: zoneID)
         let record = CKRecord(recordType: CKRecordType.client.rawValue, recordID: recordID)
@@ -68,21 +89,23 @@ actor CloudKitManager {
         record["createdAt"] = client.createdAt
         record["updatedAt"] = Date.now
 
-        _ = try await privateDatabase.save(record)
+        _ = try await db.save(record)
     }
 
     func fetchClients() async throws -> [CKRecord] {
+        let db = try requireDatabase()
         let zoneID = CKRecordZone.ID(zoneName: CKZoneName.clients.rawValue)
         let query = CKQuery(recordType: CKRecordType.client.rawValue, predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "lastName", ascending: true)]
 
-        let (results, _) = try await privateDatabase.records(matching: query, inZoneWith: zoneID)
+        let (results, _) = try await db.records(matching: query, inZoneWith: zoneID)
         return results.compactMap { try? $0.1.get() }
     }
 
     // MARK: - Assessment Operations
 
     func saveAssessment(_ assessment: AssessmentSession) async throws {
+        let db = try requireDatabase()
         let zoneID = CKRecordZone.ID(zoneName: CKZoneName.assessments.rawValue)
         let recordID = CKRecord.ID(recordName: assessment.id, zoneID: zoneID)
         let record = CKRecord(recordType: CKRecordType.assessment.rawValue, recordID: recordID)
@@ -100,12 +123,13 @@ actor CloudKitManager {
         record["createdAt"] = assessment.createdAt
         record["updatedAt"] = Date.now
 
-        _ = try await privateDatabase.save(record)
+        _ = try await db.save(record)
     }
 
     // MARK: - Care Plan Operations
 
     func saveCarePlan(_ plan: CarePlan) async throws {
+        let db = try requireDatabase()
         let zoneID = CKRecordZone.ID(zoneName: CKZoneName.carePlans.rawValue)
         let recordID = CKRecord.ID(recordName: plan.id, zoneID: zoneID)
         let record = CKRecord(recordType: CKRecordType.carePlan.rawValue, recordID: recordID)
@@ -121,7 +145,7 @@ actor CloudKitManager {
         record["nextReviewDate"] = plan.nextReviewDate
         record["updatedAt"] = Date.now
 
-        _ = try await privateDatabase.save(record)
+        _ = try await db.save(record)
     }
 
     // MARK: - Sync Engine
@@ -131,6 +155,7 @@ actor CloudKitManager {
         localAssessments: [AssessmentSession],
         localPlans: [CarePlan]
     ) async throws {
+        guard isEnabled else { return }
         for client in localClients {
             try await saveClient(client)
         }
@@ -143,6 +168,9 @@ actor CloudKitManager {
     }
 
     func fetchChanges(since token: CKServerChangeToken?) async throws -> (records: [CKRecord], deletedIDs: [CKRecord.ID], newToken: CKServerChangeToken?) {
+        guard isEnabled else { return ([], [], token) }
+        let db = try requireDatabase()
+
         var changedRecords: [CKRecord] = []
         var deletedIDs: [CKRecord.ID] = []
         var newToken: CKServerChangeToken?
@@ -171,7 +199,7 @@ actor CloudKitManager {
                 }
             }
 
-            privateDatabase.add(operation)
+            db.add(operation)
         }
 
         return (changedRecords, deletedIDs, newToken)
@@ -180,6 +208,8 @@ actor CloudKitManager {
     // MARK: - Subscriptions
 
     func setupPushSubscriptions() async throws {
+        guard isEnabled else { return }
+        let db = try requireDatabase()
         for zone in CKZoneName.allCases {
             let zoneID = CKRecordZone.ID(zoneName: zone.rawValue)
             let subscription = CKRecordZoneSubscription(zoneID: zoneID, subscriptionID: "sub_\(zone.rawValue)")
@@ -188,7 +218,7 @@ actor CloudKitManager {
             notificationInfo.shouldSendContentAvailable = true
             subscription.notificationInfo = notificationInfo
 
-            _ = try await privateDatabase.save(subscription)
+            _ = try await db.save(subscription)
         }
     }
 
@@ -201,8 +231,9 @@ actor CloudKitManager {
     }
 
     func deleteRecord(id: String, zone: CKZoneName) async throws {
+        let db = try requireDatabase()
         let zoneID = CKRecordZone.ID(zoneName: zone.rawValue)
         let recordID = CKRecord.ID(recordName: id, zoneID: zoneID)
-        try await privateDatabase.deleteRecord(withID: recordID)
+        try await db.deleteRecord(withID: recordID)
     }
 }

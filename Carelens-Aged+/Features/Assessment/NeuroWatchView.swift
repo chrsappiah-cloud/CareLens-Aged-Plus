@@ -24,8 +24,7 @@ struct NeuroWatchView: View {
         .background(Color.clear)
         .navigationTitle("NeuroWatch")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 HStack {

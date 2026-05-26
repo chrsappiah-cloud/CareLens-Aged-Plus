@@ -78,8 +78,7 @@ struct SocialMediaLinksView: View {
         .padding()
         .navigationTitle("Connect With Us")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
     }
 
     private var headerSection: some View {

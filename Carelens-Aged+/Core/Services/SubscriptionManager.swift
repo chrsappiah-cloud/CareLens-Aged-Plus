@@ -41,11 +41,12 @@ enum SubscriptionTier: String, Codable, CaseIterable {
             return [.dashboard, .clientProfiles, .basicAssessment]
         case .starter:
             return [.dashboard, .clientProfiles, .basicAssessment, .neuroWatch,
-                    .carePlans, .basicReports]
+                    .carePlans, .basicReports, .supabasePrimary, .cloudSync]
         case .professional:
             return [.dashboard, .clientProfiles, .basicAssessment, .neuroWatch,
                     .differentialScreen, .carePlans, .basicReports, .advancedReports,
-                    .monitoring, .spiritualAssessment, .acpModule, .aiInsights]
+                    .monitoring, .spiritualAssessment, .acpModule, .aiInsights,
+                    .supabasePrimary, .cloudSync, .cloudflareBackup]
         case .enterprise:
             return AppFeature.allCases
         }
@@ -68,7 +69,9 @@ enum AppFeature: String, Codable, CaseIterable {
     case caregivingModule = "Caregiving & Support"
     case incomeServices = "Income & Services"
     case interventionReview = "Intervention Review"
-    case cloudSync = "CloudKit Sync"
+    case cloudSync = "iCloud / CloudKit Sync"
+    case supabasePrimary = "Supabase Primary Database"
+    case cloudflareBackup = "Cloudflare Backup"
     case supabaseBackup = "Supabase Backup"
     case adminPanel = "Admin Panel"
     case multiUser = "Multi-User Access"
@@ -92,6 +95,8 @@ enum AppFeature: String, Codable, CaseIterable {
         case .incomeServices: return "creditcard"
         case .interventionReview: return "stethoscope"
         case .cloudSync: return "icloud"
+        case .supabasePrimary: return "cylinder.split.1x2"
+        case .cloudflareBackup: return "cloud.fill"
         case .supabaseBackup: return "externaldrive.badge.checkmark"
         case .adminPanel: return "gear.badge"
         case .multiUser: return "person.3.sequence"

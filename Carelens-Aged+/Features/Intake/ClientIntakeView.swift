@@ -93,6 +93,10 @@ struct ClientIntakeView: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
+                            ScreenIntroHeader(
+                                title: AppTab.admit.screenTitle,
+                                subtitle: AppTab.admit.subtitle
+                            )
                             stepContent
                         }
                         .padding()
@@ -102,9 +106,9 @@ struct ClientIntakeView: View {
                 }
             }
             .background(Color.clear)
-            .navigationTitle("Client Intake")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationTitle(AppTab.admit.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
             .alert("Submit Intake?", isPresented: $showingConfirmation) {
                 Button("Submit", role: .destructive) { submitIntake() }
                 Button("Cancel", role: .cancel) {}

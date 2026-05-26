@@ -21,8 +21,7 @@ struct AdminPanelView: View {
             }
             .background(Color.clear)
             .navigationTitle("Admin Panel")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .careLensDarkChrome()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: { showingAddUser = true }) {

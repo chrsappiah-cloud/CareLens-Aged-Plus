@@ -2,14 +2,10 @@ import SwiftUI
 
 struct RootTabView: View {
     @EnvironmentObject var authService: AuthenticationService
-    @State private var selectedTab = 0
+    @State private var selectedTab: AppTab = .home
 
-    private var isAdmin: Bool {
-        authService.currentUser?.role == .admin
-    }
-
-    private var userTier: SubscriptionTier {
-        authService.currentUser?.subscriptionTier ?? .free
+    private var visibleTabs: [AppTab] {
+        AppTab.allCases.filter { $0.isVisible(for: authService) }
     }
 
     var body: some View {
@@ -17,47 +13,57 @@ struct RootTabView: View {
             FuturisticBackground()
 
             TabView(selection: $selectedTab) {
-                DashboardView()
-                    .tabItem { Label("Dashboard", systemImage: "rectangle.3.group") }
-                    .tag(0)
+                tabContent(.home) {
+                    DashboardView()
+                }
 
-                ClientIntakeView()
-                    .tabItem { Label("Intake", systemImage: "person.badge.plus") }
-                    .tag(7)
+                tabContent(.clients) {
+                    ClientListView()
+                }
 
-                ClientListView()
-                    .tabItem { Label("Clients", systemImage: "person.2") }
-                    .tag(1)
+                tabContent(.admit) {
+                    ClientIntakeView()
+                }
 
                 if authService.hasAccess(to: .basicAssessment) {
-                    AssessmentsHomeView()
-                        .tabItem { Label("Assess", systemImage: "checklist") }
-                        .tag(2)
+                    tabContent(.assessments) {
+                        AssessmentsHomeView()
+                    }
                 }
 
                 if authService.hasAccess(to: .carePlans) {
-                    CarePlanHomeView()
-                        .tabItem { Label("Care Plan", systemImage: "cross.case") }
-                        .tag(3)
+                    tabContent(.carePlans) {
+                        CarePlanHomeView()
+                    }
                 }
 
                 if authService.hasAccess(to: .basicReports) {
-                    ReportsHomeView()
-                        .tabItem { Label("Reports", systemImage: "doc.text") }
-                        .tag(4)
+                    tabContent(.reports) {
+                        ReportsHomeView()
+                    }
                 }
 
-                if isAdmin {
-                    AdminPanelView()
-                        .tabItem { Label("Admin", systemImage: "gear.badge") }
-                        .tag(6)
+                tabContent(.settings) {
+                    SettingsView()
                 }
-
-                SettingsView()
-                    .tabItem { Label("Settings", systemImage: "gearshape") }
-                    .tag(5)
             }
-            .tint(CareLensTheme.Colors.goldLight)
+            .tint(CareLensTheme.Colors.tabSelected)
+            .toolbarBackground(CareLensTheme.Colors.tabBarBackground, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .toolbarColorScheme(.dark, for: .tabBar)
         }
+        .preferredColorScheme(.dark)
+    }
+
+    @ViewBuilder
+    private func tabContent<Content: View>(_ tab: AppTab, @ViewBuilder content: () -> Content) -> some View {
+        content()
+            .tabItem {
+                Label(tab.tabLabel, systemImage: tab.icon)
+            }
+            .tag(tab)
+            .accessibilityIdentifier(tab.accessibilityIdentifier)
+            .accessibilityLabel(tab.screenTitle)
+            .accessibilityHint(tab.accessibilityHint)
     }
 }

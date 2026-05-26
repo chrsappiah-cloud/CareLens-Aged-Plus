@@ -4,26 +4,37 @@ import SwiftUI
 
 struct CareLensTheme {
     struct Colors {
-        static let backgroundTop    = Color(red: 0.07, green: 0.02, blue: 0.15)
-        static let backgroundBottom = Color(red: 0.01, green: 0.16, blue: 0.12)
-        static let accentMint       = Color(red: 0.39, green: 0.99, blue: 0.74)
-        static let accentMagenta    = Color(red: 0.82, green: 0.39, blue: 1.00)
-        static let accentAmber      = Color(red: 0.98, green: 0.76, blue: 0.30)
+        // Deep canvas — near-black violet / charcoal
+        static let backgroundTop    = Color(red: 0.02, green: 0.01, blue: 0.06)
+        static let backgroundBottom = Color(red: 0.01, green: 0.04, blue: 0.07)
+        static let surfaceDeep      = Color(red: 0.03, green: 0.02, blue: 0.08)
+        static let surfaceElevated  = Color(red: 0.09, green: 0.07, blue: 0.15)
+        static let surfaceCard      = Color(red: 0.11, green: 0.09, blue: 0.18)
+        static let tabBarBackground = Color(red: 0.02, green: 0.02, blue: 0.05)
 
-        // Diamond gold palette
-        static let goldPrimary      = Color(red: 0.85, green: 0.70, blue: 0.20)
-        static let goldLight        = Color(red: 0.95, green: 0.85, blue: 0.35)
-        static let goldDeep         = Color(red: 0.75, green: 0.55, blue: 0.10)
+        static let accentMint       = Color(red: 0.45, green: 1.00, blue: 0.78)
+        static let accentMagenta    = Color(red: 0.88, green: 0.48, blue: 1.00)
+        static let accentAmber      = Color(red: 1.00, green: 0.82, blue: 0.38)
+
+        // Diamond gold palette — vivid on dark backgrounds
+        static let goldPrimary      = Color(red: 0.92, green: 0.76, blue: 0.22)
+        static let goldLight        = Color(red: 1.00, green: 0.93, blue: 0.48)
+        static let goldDeep         = Color(red: 0.62, green: 0.48, blue: 0.08)
+        static let tabSelected      = goldLight
+        static let tabUnselected    = Color(red: 0.68, green: 0.66, blue: 0.76)
+
         // Emerald green palette
-        static let emeraldGreen     = Color(red: 0.18, green: 0.80, blue: 0.45)
-        static let deepForest       = Color(red: 0.05, green: 0.45, blue: 0.25)
+        static let emeraldGreen     = Color(red: 0.22, green: 0.88, blue: 0.52)
+        static let deepForest       = Color(red: 0.04, green: 0.38, blue: 0.22)
 
-        static let cardFill         = Color.white.opacity(0.08)
-        static let cardBorder       = Color.white.opacity(0.40)
-        // High-contrast dark text palette for maximum readability
-        static let textPrimary      = Color.white                                 // Pure white — highest contrast
-        static let textSecondary    = Color(red: 0.88, green: 0.85, blue: 0.92)  // Bright lavender-white
-        static let textTertiary     = Color(red: 0.72, green: 0.68, blue: 0.75)  // Muted purple-grey
+        static let cardFill         = surfaceCard.opacity(0.95)
+        static let cardBorder       = Color.white.opacity(0.22)
+        static let buttonLabelOnAccent = Color(red: 0.04, green: 0.03, blue: 0.08)
+
+        // High-contrast text on deep backgrounds
+        static let textPrimary      = Color(red: 0.99, green: 0.98, blue: 1.00)
+        static let textSecondary    = Color(red: 0.84, green: 0.82, blue: 0.90)
+        static let textTertiary     = Color(red: 0.64, green: 0.60, blue: 0.72)
         // Rich accent text colors
         static let textDeepBlue     = Color(red: 0.50, green: 0.58, blue: 0.98)  // Vivid royal blue
         static let textPurple       = Color(red: 0.75, green: 0.50, blue: 0.95)  // Bright purple
@@ -41,9 +52,15 @@ struct CareLensTheme {
         )
 
         static let primaryButton = LinearGradient(
-            colors: [Colors.accentMint, Colors.accentMagenta],
+            colors: [Colors.goldDeep, Colors.goldPrimary, Colors.emeraldGreen.opacity(0.85)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
+        )
+
+        static let tabBarTopEdge = LinearGradient(
+            colors: [Colors.goldPrimary.opacity(0.45), Colors.emeraldGreen.opacity(0.2), .clear],
+            startPoint: .leading,
+            endPoint: .trailing
         )
 
         static let iconGradient = LinearGradient(
@@ -154,7 +171,6 @@ struct CLCardStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(CareLensTheme.spacing)
-            .background(.ultraThinMaterial)
             .background(
                 RoundedRectangle(cornerRadius: CareLensTheme.cardCornerRadius, style: .continuous)
                     .fill(CareLensTheme.Colors.cardFill)
@@ -182,6 +198,37 @@ struct CLCardStyle: ViewModifier {
 extension View {
     func clCard() -> some View {
         modifier(CLCardStyle())
+    }
+
+    /// Deep-dark navigation chrome with high-contrast titles.
+    func careLensDarkChrome() -> some View {
+        self
+            .preferredColorScheme(.dark)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(CareLensTheme.Colors.surfaceDeep.opacity(0.92), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .tint(CareLensTheme.Colors.goldLight)
+    }
+
+    /// Forms and lists on the futuristic background.
+    func careLensDarkForm() -> some View {
+        self
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
+            .foregroundStyle(CareLensTheme.Colors.textPrimary)
+            .tint(CareLensTheme.Colors.goldLight)
+    }
+
+    func careLensDarkListRow() -> some View {
+        listRowBackground(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(CareLensTheme.Colors.surfaceElevated)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(CareLensTheme.Colors.cardBorder.opacity(0.5), lineWidth: 0.5)
+                )
+        )
+        .listRowSeparatorTint(CareLensTheme.Colors.cardBorder.opacity(0.35))
     }
 }
 

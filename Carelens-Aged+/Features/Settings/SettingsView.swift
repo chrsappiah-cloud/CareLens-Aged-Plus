@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @EnvironmentObject var authService: AuthenticationService
@@ -7,10 +8,20 @@ struct SettingsView: View {
     @State private var clinicalMode = false
 
     private var currentUser: AppUser? { authService.currentUser }
+    private var isAdmin: Bool { authService.currentUser?.role == .admin }
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    ScreenIntroHeader(
+                        title: AppTab.settings.screenTitle,
+                        subtitle: AppTab.settings.subtitle
+                    )
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                }
+
                 Section {
                     HStack(spacing: 14) {
                         ZStack {
@@ -26,13 +37,13 @@ struct SettingsView: View {
                                 .font(.headline)
                             Text(currentUser?.email ?? "")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(CareLensTheme.Colors.textSecondary)
                             HStack(spacing: 6) {
                                 Text(currentUser?.role.rawValue ?? "")
                                     .font(.caption2)
                                     .foregroundStyle(CareLensTheme.Colors.accentMint)
                                 Text("·")
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(CareLensTheme.Colors.textSecondary)
                                 Text(currentUser?.subscriptionTier.rawValue ?? "")
                                     .font(.caption2)
                                     .foregroundStyle(currentUser?.subscriptionTier.color ?? .gray)
@@ -70,11 +81,27 @@ struct SettingsView: View {
                         .foregroundStyle(CareLensTheme.Colors.accentMint)
                 }
 
+                if isAdmin {
+                    Section {
+                        NavigationLink {
+                            AdminPanelView()
+                        } label: {
+                            Label("Facility Admin Panel", systemImage: "gear.badge")
+                        }
+                        Text("Manage users, roles, and facility-wide settings")
+                            .font(.caption)
+                            .foregroundStyle(CareLensTheme.Colors.textSecondary)
+                    } header: {
+                        Label("Administration", systemImage: "shield.lefthalf.filled")
+                            .foregroundStyle(CareLensTheme.Colors.accentMagenta)
+                    }
+                }
+
                 Section {
                     Toggle("Clinical Mode", isOn: $clinicalMode)
-                    Text("Reduces visual effects for clinical environments")
+                    Text("High-contrast, reduced motion — recommended in ward environments")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(CareLensTheme.Colors.textSecondary)
                 } header: {
                     Label("Display", systemImage: "eye")
                         .foregroundStyle(CareLensTheme.Colors.accentMint)
@@ -93,9 +120,21 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    NavigationLink("Privacy Policy") { Text("Privacy Policy") }
-                    NavigationLink("Terms of Use") { Text("Terms of Use") }
-                    NavigationLink("Data Retention Policy") { Text("Data Retention") }
+                    NavigationLink {
+                        LegalDocumentView(document: .privacyPolicy)
+                    } label: {
+                        Text("Privacy Policy")
+                    }
+                    NavigationLink {
+                        LegalDocumentView(document: .termsOfUse)
+                    } label: {
+                        Text("Terms of Use")
+                    }
+                    NavigationLink {
+                        LegalDocumentView(document: .dataRetention)
+                    } label: {
+                        Text("Data Retention Policy")
+                    }
                     NavigationLink("Audit Log") { Text("Audit trail") }
                 } header: {
                     Label("Legal & Compliance", systemImage: "lock.shield")
@@ -129,12 +168,14 @@ struct SettingsView: View {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("1.0.0").foregroundStyle(.secondary)
+                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                            .foregroundStyle(CareLensTheme.Colors.textSecondary)
                     }
                     HStack {
                         Text("Build")
                         Spacer()
-                        Text("1").foregroundStyle(.secondary)
+                        Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
+                            .foregroundStyle(CareLensTheme.Colors.textSecondary)
                     }
                 } header: {
                     Label("About", systemImage: "info.circle")
@@ -152,50 +193,96 @@ struct SettingsView: View {
                     }
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
-            .navigationTitle("Settings")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .careLensDarkForm()
+            .navigationTitle(AppTab.settings.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
         }
     }
 }
 
 struct BackupSettingsView: View {
+    @EnvironmentObject var authService: AuthenticationService
     @StateObject private var middleware = NetworkMiddleware.shared
+    @Query private var clients: [ClientProfile]
+    @Query(sort: \AssessmentSession.updatedAt, order: .reverse) private var assessments: [AssessmentSession]
+    @Query private var carePlans: [CarePlan]
+    @State private var syncMessage: String?
+    @State private var isSyncing = false
 
     var body: some View {
         Form {
-            Section("Sync Status") {
-                HStack {
-                    Text("CloudKit")
-                    Spacer()
-                    DiamondStatusChip(text: "Connected", level: .safe)
-                }
-                HStack {
-                    Text("Supabase Backup")
-                    Spacer()
-                    DiamondStatusChip(text: "Active", level: .safe)
-                }
+            Section {
+                Text("Supabase is the primary database. iCloud CloudKit and Cloudflare receive automatic backups after each successful sync. On simulator, enable CloudKit with ENABLE_CLOUDKIT=1 in the scheme environment.")
+                    .font(.caption)
+                    .foregroundStyle(CareLensTheme.Colors.textSecondary)
+            }
+
+            Section("Pipeline Status") {
+                syncRow("Supabase (Primary)", pipeline: middleware.lastSyncPipeline?.primary)
+                syncRow("iCloud / CloudKit", pipeline: middleware.lastSyncPipeline?.cloudKit)
+                syncRow("Cloudflare", pipeline: middleware.lastSyncPipeline?.cloudflare)
                 if let lastSync = middleware.lastSyncTime {
                     HStack {
-                        Text("Last Sync")
+                        Text("Last E2E Sync")
                         Spacer()
                         Text(lastSync.formatted(date: .abbreviated, time: .shortened))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(CareLensTheme.Colors.textSecondary)
                     }
                 }
             }
 
+            if let syncMessage {
+                Section {
+                    Text(syncMessage)
+                        .font(.caption)
+                        .foregroundStyle(CareLensTheme.Colors.accentMint)
+                }
+            }
+
             Section("Actions") {
-                Button("Force Sync Now") {}
-                    .foregroundStyle(CareLensTheme.Colors.accentMint)
-                Button("Export All Data") {}
-                    .foregroundStyle(CareLensTheme.Colors.accentMint)
-                Button("Restore from Backup") {}
-                    .foregroundStyle(CareLensTheme.Colors.accentAmber)
+                Button(isSyncing ? "Syncing…" : "Run End-to-End Sync") {
+                    Task { await runSync() }
+                }
+                .disabled(isSyncing)
+                .foregroundStyle(CareLensTheme.Colors.accentMint)
             }
         }
+        .careLensDarkForm()
+        .careLensDarkChrome()
         .navigationTitle("Backup & Recovery")
+    }
+
+    private func syncRow(_ title: String, pipeline: SyncStepResult?) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            if let pipeline {
+                DiamondStatusChip(
+                    text: pipeline.succeeded ? "OK (\(pipeline.recordsWritten))" : "Error",
+                    level: pipeline.succeeded ? .safe : .risk
+                )
+            } else {
+                DiamondStatusChip(text: "Pending", level: .warning)
+            }
+        }
+    }
+
+    private func runSync() async {
+        isSyncing = true
+        syncMessage = nil
+        let tier = authService.currentUser?.subscriptionTier ?? .free
+        do {
+            try await middleware.syncData(
+                clients: clients,
+                assessments: assessments,
+                plans: carePlans,
+                userTier: tier
+            )
+            syncMessage = "Sync complete — primary + backups updated."
+        } catch {
+            syncMessage = error.localizedDescription
+        }
+        isSyncing = false
     }
 }

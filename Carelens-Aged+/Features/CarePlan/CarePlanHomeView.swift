@@ -7,15 +7,22 @@ struct CarePlanHomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
+                ScreenIntroHeader(
+                    title: AppTab.carePlans.screenTitle,
+                    subtitle: AppTab.carePlans.subtitle
+                )
+                .padding(.horizontal)
+                .padding(.top, 8)
+
                 if clients.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "cross.case")
                             .font(.system(size: 48))
                             .foregroundStyle(CareLensTheme.Colors.textTertiary)
-                        Text("No Care Plans")
+                        Text("No Care Plans Yet")
                             .font(.title3.bold())
                             .foregroundStyle(CareLensTheme.Colors.textPrimary)
-                        Text("Create assessments first to generate care plans")
+                        Text("Complete an assessment first — plans appear here automatically")
                             .font(.subheadline)
                             .foregroundStyle(CareLensTheme.Colors.textSecondary)
                     }
@@ -50,9 +57,9 @@ struct CarePlanHomeView: View {
                 }
             }
             .background(Color.clear)
-            .navigationTitle("Care Plans")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationTitle(AppTab.carePlans.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
         }
     }
 }
@@ -84,8 +91,7 @@ struct CarePlanDetailView: View {
         }
         .background(Color.clear)
         .navigationTitle("\(client.firstName)'s Care Plan")
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
     }
 
     private func carePlanCard(_ plan: CarePlan) -> some View {

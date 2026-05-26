@@ -45,22 +45,19 @@ struct LoginView: View {
                     .foregroundStyle(.white)
             }
 
-            Text("CareLens Age+")
+            Text("CareLens Aged+")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.35, green: 0.40, blue: 0.88),
-                            Color(red: 0.60, green: 0.35, blue: 0.80),
-                            Color(red: 0.72, green: 0.50, blue: 0.32)
-                        ],
-                        startPoint: .leading, endPoint: .trailing
-                    )
-                )
+                .foregroundStyle(CareLensTheme.Colors.goldLight)
 
-            Text("Aged Care Assessment Platform")
-                .font(.subheadline)
+            Text("Intelligent aged care for clinicians & care teams")
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(CareLensTheme.Colors.textSecondary)
+                .multilineTextAlignment(.center)
+
+            Text("Assessments · NeuroWatch · Care plans · AI insights")
+                .font(.caption)
+                .foregroundStyle(CareLensTheme.Colors.textTertiary)
+                .multilineTextAlignment(.center)
         }
     }
 
@@ -70,17 +67,17 @@ struct LoginView: View {
                 Text("Email")
                     .font(.caption.bold())
                     .foregroundStyle(CareLensTheme.Colors.textSecondary)
-                TextField("", text: $email)
+                TextField("name@facility.org", text: $email)
                     .textFieldStyle(.plain)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                     .foregroundStyle(CareLensTheme.Colors.textPrimary)
                     .padding()
-                    .background(Color.white.opacity(0.06))
+                    .background(CareLensTheme.Colors.surfaceElevated)
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
+                            .strokeBorder(CareLensTheme.Colors.goldPrimary.opacity(0.4), lineWidth: 1)
                     )
             }
 
@@ -90,10 +87,10 @@ struct LoginView: View {
                     .foregroundStyle(CareLensTheme.Colors.textSecondary)
                 HStack {
                     if showPassword {
-                        TextField("", text: $password)
+                        TextField("Enter password", text: $password)
                             .foregroundStyle(CareLensTheme.Colors.textPrimary)
                     } else {
-                        SecureField("", text: $password)
+                        SecureField("Enter password", text: $password)
                             .foregroundStyle(CareLensTheme.Colors.textPrimary)
                     }
                     Button(action: { showPassword.toggle() }) {
@@ -102,11 +99,11 @@ struct LoginView: View {
                     }
                 }
                 .padding()
-                .background(Color.white.opacity(0.06))
+                .background(CareLensTheme.Colors.surfaceElevated)
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
+                        .strokeBorder(CareLensTheme.Colors.goldPrimary.opacity(0.4), lineWidth: 1)
                 )
             }
         }
@@ -121,7 +118,7 @@ struct LoginView: View {
                 } else {
                     HStack {
                         Image(systemName: "arrow.right.circle.fill")
-                        Text("Sign In")
+                        Text("Sign In to CareLens")
                     }
                 }
             }
@@ -134,15 +131,23 @@ struct LoginView: View {
 
     private var demoCredentials: some View {
         VStack(spacing: 8) {
-            Text("Demo Credentials")
+            Text("Quick demo sign-in")
                 .font(.caption.bold())
+                .foregroundStyle(CareLensTheme.Colors.textTertiary)
+
+            Text("Tap a role to fill credentials, then sign in")
+                .font(.caption2)
                 .foregroundStyle(CareLensTheme.Colors.textTertiary)
 
             Button(action: { email = "admin@carelens.health"; password = "CareLens2026!" }) {
                 HStack {
                     DiamondShape().fill(CareLensTheme.Colors.accentMagenta).frame(width: 8, height: 8)
-                    Text("Admin: admin@carelens.health")
-                        .font(.caption)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Administrator (full access)")
+                            .font(.caption.weight(.semibold))
+                        Text("admin@carelens.health")
+                            .font(.caption2)
+                    }
                 }
                 .foregroundStyle(CareLensTheme.Colors.textSecondary)
             }
@@ -150,8 +155,12 @@ struct LoginView: View {
             Button(action: { email = "clinician@carelens.health"; password = "password123" }) {
                 HStack {
                     DiamondShape().fill(CareLensTheme.Colors.accentMint).frame(width: 8, height: 8)
-                    Text("Clinician: clinician@carelens.health")
-                        .font(.caption)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Clinician (professional tier)")
+                            .font(.caption.weight(.semibold))
+                        Text("clinician@carelens.health")
+                            .font(.caption2)
+                    }
                 }
                 .foregroundStyle(CareLensTheme.Colors.textSecondary)
             }

@@ -1,0 +1,26 @@
+CareLens Aged+ is an intelligent aged care platform for clinicians, facility managers, and care teams. Deliver safer, more proactive care with structured assessments, NeuroWatch monitoring, and AI-assisted clinical decision support.
+
+KEY FEATURES
+
+• NeuroWatch Engine — Track cognitive trends and receive early risk alerts with actionable clinical guidance.
+
+• Biopsychosocial Assessments — Complete structured intake workflows including medical history, cognitive screening, functional assessment, social support, and risk factors.
+
+• AI Clinical Insights — Generate differential considerations, care plan suggestions, and report narratives powered by GPT-4o. All outputs are decision-support only and require professional review.
+
+• Client Management — Maintain longitudinal client profiles with assessments, incidents, and collateral reports.
+
+• Care Plans & Reports — Build evidence-based care plans and export clinical summaries for multidisciplinary teams.
+
+• Monitoring & Charts — Visualise longitudinal data to spot changes between reviews.
+
+• Secure Sync — CloudKit sync with optional encrypted backup. Role-based access for administrators, clinicians, and carers.
+
+• Subscription Plans — Free, Starter, Professional, and Enterprise tiers via Apple In-App Purchase.
+
+IMPORTANT
+
+CareLens Aged+ is clinical decision-support software. It does not provide emergency services or replace qualified medical judgment. Always verify recommendations before acting on them.
+
+Support: https://wcs-full.vercel.app
+Privacy: https://wcs-full.vercel.app/privacy

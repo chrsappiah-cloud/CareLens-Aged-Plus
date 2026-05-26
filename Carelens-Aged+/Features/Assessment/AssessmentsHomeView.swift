@@ -23,6 +23,12 @@ struct AssessmentsHomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: CareLensTheme.spacing) {
+                    ScreenIntroHeader(
+                        title: AppTab.assessments.screenTitle,
+                        subtitle: AppTab.assessments.subtitle
+                    )
+                    .padding(.horizontal)
+
                     if let client = selectedClient {
                         clientBanner(client)
                         assessmentGrid(client: client)
@@ -33,24 +39,24 @@ struct AssessmentsHomeView: View {
                 .padding(.bottom, 36)
             }
             .background(Color.clear)
-            .navigationTitle("Assessments")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationTitle(AppTab.assessments.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
         }
     }
 
     private func clientBanner(_ client: ClientProfile) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Assessing")
-                    .font(.caption)
-                    .foregroundStyle(CareLensTheme.Colors.textSecondary)
+                Text("Currently assessing")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(CareLensTheme.Colors.accentMint)
                 Text(client.fullName)
                     .font(.headline)
                     .foregroundStyle(CareLensTheme.Colors.textPrimary)
             }
             Spacer()
-            Button("Change") { selectedClient = nil }
+            Button("Switch client") { selectedClient = nil }
                 .font(.caption.bold())
                 .foregroundStyle(CareLensTheme.Colors.accentMint)
         }

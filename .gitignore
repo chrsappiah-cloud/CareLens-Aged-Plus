@@ -47,3 +47,4 @@ result.xcresult/
 .env
 *.key
 credentials.json
+.idea/

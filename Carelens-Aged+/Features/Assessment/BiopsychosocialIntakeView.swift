@@ -57,8 +57,7 @@ struct BiopsychosocialIntakeView: View {
         .background(Color.clear)
         .navigationTitle(moduleName)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
     }
 
     private var progressBar: some View {

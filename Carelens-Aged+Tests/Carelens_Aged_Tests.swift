@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-@testable import Carelens_Aged_
+@testable import CarelensAged
 
 // MARK: - Authentication Service Tests
 
@@ -231,11 +231,16 @@ struct ApplePaySubscriptionTests {
         let store = ApplePaySubscriptionService()
         await store.purchase(.professionalMonthly)
         #expect(store.purchasedSubscription == .professionalMonthly)
-        if case .success = store.transactionStatus {
-            // pass
-        } else {
-            #expect(Bool(false), "Expected success status")
-        }
+        #expect(store.transactionStatus == .success)
+        #expect(AuthenticationService.shared.currentUser?.subscriptionTier == .professional || AuthenticationService.shared.currentUser == nil)
+    }
+
+    @Test @MainActor func purchaseUpdatesAuthTierWhenLoggedIn() async {
+        let auth = AuthenticationService.shared
+        _ = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
+        let store = ApplePaySubscriptionService()
+        await store.purchase(.starterMonthly)
+        #expect(auth.currentUser?.subscriptionTier == .starter)
     }
 
     @Test func subscriptionProductTierMapping() {
@@ -333,8 +338,8 @@ struct AppFeatureTests {
 
     @Test func featureCountPerTier() {
         #expect(SubscriptionTier.free.features.count == 3)
-        #expect(SubscriptionTier.starter.features.count == 6)
-        #expect(SubscriptionTier.professional.features.count == 12)
+        #expect(SubscriptionTier.starter.features.count == 8)
+        #expect(SubscriptionTier.professional.features.count == 15)
         #expect(SubscriptionTier.enterprise.features.count == AppFeature.allCases.count)
     }
 

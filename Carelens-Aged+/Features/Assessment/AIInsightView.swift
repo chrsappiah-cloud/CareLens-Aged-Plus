@@ -31,8 +31,7 @@ struct AIInsightView: View {
         .background(Color.clear)
         .navigationTitle("AI Insights")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
     }
 
     private var headerCard: some View {

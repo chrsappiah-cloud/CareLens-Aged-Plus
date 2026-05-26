@@ -1,0 +1,4 @@
+app_identifier("wcs.Carelens-Aged-")
+apple_id(ENV["APPLE_ID"])
+team_id("TM2WG7HH96")
+itc_team_id(ENV.fetch("APP_STORE_CONNECT_TEAM_ID", "TM2WG7HH96"))

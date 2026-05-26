@@ -51,7 +51,9 @@ class AuthenticationService: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        try? await Task.sleep(nanoseconds: 800_000_000)
+        if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            try? await Task.sleep(nanoseconds: 800_000_000)
+        }
 
         if let _ = adminCredentials.first(where: { $0.email == email && $0.password == password }) {
             currentUser = AppUser(

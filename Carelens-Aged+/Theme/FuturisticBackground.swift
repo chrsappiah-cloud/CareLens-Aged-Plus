@@ -6,38 +6,42 @@ struct FuturisticBackground: View {
             CareLensTheme.Gradients.background
                 .ignoresSafeArea()
 
+            CareLensTheme.Colors.surfaceDeep
+                .ignoresSafeArea()
+                .opacity(0.55)
+
             RadialGradient(
                 colors: [
-                    CareLensTheme.Colors.goldPrimary.opacity(0.25),
+                    CareLensTheme.Colors.goldPrimary.opacity(0.12),
                     .clear
                 ],
                 center: .topTrailing,
                 startRadius: 20,
-                endRadius: 350
+                endRadius: 320
             )
-            .blendMode(.screen)
+            .blendMode(.plusLighter)
 
             RadialGradient(
                 colors: [
-                    CareLensTheme.Colors.emeraldGreen.opacity(0.35),
+                    CareLensTheme.Colors.emeraldGreen.opacity(0.14),
                     .clear
                 ],
                 center: .bottomLeading,
                 startRadius: 10,
-                endRadius: 320
+                endRadius: 280
             )
-            .blendMode(.screen)
+            .blendMode(.plusLighter)
 
             RadialGradient(
                 colors: [
-                    CareLensTheme.Colors.goldDeep.opacity(0.15),
+                    CareLensTheme.Colors.accentMagenta.opacity(0.08),
                     .clear
                 ],
                 center: .center,
                 startRadius: 5,
-                endRadius: 250
+                endRadius: 220
             )
-            .blendMode(.screen)
+            .blendMode(.plusLighter)
 
             DiamondFieldLayer()
         }

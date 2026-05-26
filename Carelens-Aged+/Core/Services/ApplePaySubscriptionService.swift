@@ -49,6 +49,10 @@ enum SubscriptionProduct: String, CaseIterable {
         default: return nil
         }
     }
+
+    static var allProductIDs: [String] {
+        allCases.map(\.rawValue)
+    }
 }
 
 @MainActor
@@ -56,12 +60,40 @@ class ApplePaySubscriptionService: ObservableObject {
     static let shared = ApplePaySubscriptionService()
 
     @Published var purchasedSubscription: SubscriptionProduct?
+    @Published var storeProducts: [Product] = []
     @Published var isPurchasing = false
     @Published var purchaseError: String?
     @Published var transactionStatus: TransactionStatus = .idle
 
-    enum TransactionStatus {
-        case idle, processing, success, failed(String), restored
+    private var transactionListener: Task<Void, Never>?
+    private let usesStoreKitMock: Bool
+
+    enum TransactionStatus: Equatable {
+        case idle
+        case processing
+        case success
+        case failed(String)
+        case restored
+        case pending
+    }
+
+    init() {
+        usesStoreKitMock = AppEnvironment.usesMockBackends || AppEnvironment.isRunningTests
+        transactionListener = listenForTransactions()
+        Task { await loadProducts() }
+    }
+
+    deinit {
+        transactionListener?.cancel()
+    }
+
+    func loadProducts() async {
+        guard !usesStoreKitMock else { return }
+        do {
+            storeProducts = try await Product.products(for: SubscriptionProduct.allProductIDs)
+        } catch {
+            purchaseError = "Unable to load App Store products."
+        }
     }
 
     func purchase(_ product: SubscriptionProduct) async {
@@ -69,23 +101,128 @@ class ApplePaySubscriptionService: ObservableObject {
         purchaseError = nil
         transactionStatus = .processing
 
-        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        if usesStoreKitMock {
+            await simulatePurchase(product)
+            return
+        }
 
-        purchasedSubscription = product
-        transactionStatus = .success
+        var storeProduct = storeProducts.first(where: { $0.id == product.rawValue })
+        if storeProduct == nil {
+            storeProduct = try? await Product.products(for: [product.rawValue]).first
+        }
+        guard let storeProduct else {
+            await simulatePurchase(product)
+            return
+        }
+
+        do {
+            let result = try await storeProduct.purchase()
+            switch result {
+            case .success(let verification):
+                let transaction = try checkVerified(verification)
+                await transaction.finish()
+                applyPurchase(product)
+                transactionStatus = .success
+            case .userCancelled:
+                transactionStatus = .idle
+            case .pending:
+                transactionStatus = .pending
+            @unknown default:
+                transactionStatus = .failed("Unknown purchase result")
+            }
+        } catch {
+            purchaseError = error.localizedDescription
+            transactionStatus = .failed(error.localizedDescription)
+        }
+
         isPurchasing = false
     }
 
     func restorePurchases() async {
         transactionStatus = .processing
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
-        transactionStatus = .restored
+        isPurchasing = true
+
+        if usesStoreKitMock {
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            transactionStatus = .restored
+            isPurchasing = false
+            return
+        }
+
+        do {
+            try await AppStore.sync()
+            for await result in Transaction.currentEntitlements {
+                if let transaction = try? checkVerified(result),
+                   let product = SubscriptionProduct(rawValue: transaction.productID) {
+                    applyPurchase(product)
+                    transactionStatus = .restored
+                    isPurchasing = false
+                    return
+                }
+            }
+            transactionStatus = .restored
+        } catch {
+            purchaseError = error.localizedDescription
+            transactionStatus = .failed(error.localizedDescription)
+        }
+        isPurchasing = false
     }
 
     func cancelSubscription() async {
         transactionStatus = .processing
-        try? await Task.sleep(nanoseconds: 800_000_000)
         purchasedSubscription = nil
+        AuthenticationService.shared.applySubscriptionTier(.free)
         transactionStatus = .idle
+    }
+
+    func localizedPrice(for product: SubscriptionProduct) -> String {
+        storeProducts.first(where: { $0.id == product.rawValue })?.displayPrice ?? product.price
+    }
+
+    // MARK: - Private
+
+    private func listenForTransactions() -> Task<Void, Never> {
+        Task { [weak self] in
+            for await result in Transaction.updates {
+                guard let self else { continue }
+                do {
+                    let transaction = try self.checkVerified(result)
+                    await transaction.finish()
+                    if let product = SubscriptionProduct(rawValue: transaction.productID) {
+                        self.applyPurchase(product)
+                        self.transactionStatus = .success
+                    }
+                } catch {
+                    continue
+                }
+            }
+        }
+    }
+
+    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
+        switch result {
+        case .unverified(_, let error): throw error
+        case .verified(let value): return value
+        }
+    }
+
+    private func simulatePurchase(_ product: SubscriptionProduct) async {
+        try? await Task.sleep(nanoseconds: 400_000_000)
+        applyPurchase(product)
+        transactionStatus = .success
+        isPurchasing = false
+    }
+
+    private func applyPurchase(_ product: SubscriptionProduct) {
+        purchasedSubscription = product
+        AuthenticationService.shared.applySubscriptionTier(product.tier)
+    }
+}
+
+extension AuthenticationService {
+    func applySubscriptionTier(_ tier: SubscriptionTier) {
+        guard var user = currentUser else { return }
+        user.subscriptionTier = tier
+        currentUser = user
     }
 }

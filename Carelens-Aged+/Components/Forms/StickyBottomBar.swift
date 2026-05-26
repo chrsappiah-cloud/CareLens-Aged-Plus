@@ -15,26 +15,23 @@ struct StickyBottomBar: View {
             if let onSaveDraft {
                 Button(action: onSaveDraft) {
                     Label("Save", systemImage: "square.and.arrow.down")
-                        .font(.caption)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(CareLensToolbarButtonStyle())
             }
 
             if let onAddCollateral {
                 Button(action: onAddCollateral) {
                     Label("Collateral", systemImage: "person.badge.plus")
-                        .font(.caption)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(CareLensToolbarButtonStyle())
             }
 
             if let onFlagUrgent {
                 Button(action: onFlagUrgent) {
                     Label("Urgent", systemImage: "exclamationmark.triangle")
-                        .font(.caption)
+                        .foregroundStyle(CareLensTheme.Colors.riskRed)
                 }
-                .buttonStyle(.bordered)
-                .tint(CLTheme.alertRed)
+                .buttonStyle(CareLensToolbarButtonStyle())
             }
 
             Spacer()
@@ -42,23 +39,27 @@ struct StickyBottomBar: View {
             if showGenerateSummary, let onGenerateSummary {
                 Button(action: onGenerateSummary) {
                     Label("Summary", systemImage: "doc.text")
-                        .font(.caption.bold())
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(CLTheme.successGreen)
+                .buttonStyle(CareLensProminentToolbarButtonStyle(accent: CareLensTheme.Colors.safeGreen))
             }
 
             if showNext, let onNext {
                 Button(action: onNext) {
                     Label("Next", systemImage: "arrow.right")
-                        .font(.caption.bold())
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(CLTheme.accentTeal)
+                .buttonStyle(CareLensProminentToolbarButtonStyle(accent: CareLensTheme.Colors.emeraldGreen))
             }
         }
         .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(.ultraThinMaterial)
+        .padding(.vertical, 12)
+        .background(
+            CareLensTheme.Colors.tabBarBackground
+                .overlay(
+                    Rectangle()
+                        .fill(CareLensTheme.Gradients.tabBarTopEdge)
+                        .frame(height: 1),
+                    alignment: .top
+                )
+        )
     }
 }

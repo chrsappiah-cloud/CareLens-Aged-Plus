@@ -15,6 +15,11 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: CareLensTheme.sectionSpacing) {
+                    ScreenIntroHeader(
+                        eyebrow: "Today",
+                        title: AppTab.home.screenTitle,
+                        subtitle: AppTab.home.subtitle
+                    )
                     quickActionsBar
                     alertsSection
                     caseloadOverview
@@ -24,9 +29,9 @@ struct DashboardView: View {
                 .padding()
             }
             .background(Color.clear)
-            .navigationTitle("Dashboard")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationTitle(AppTab.home.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
             .navigationDestination(isPresented: $navigateToClients) {
                 ClientListView()
             }
@@ -42,29 +47,26 @@ struct DashboardView: View {
     private var quickActionsBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                QuickActionButton(title: "New Intake", icon: "person.badge.plus", action: {})
-                QuickActionButton(title: "Start Assessment", icon: "checklist", action: { navigateToAssessments = true })
-                QuickActionButton(title: "View Clients", icon: "person.2", action: { navigateToClients = true })
-                QuickActionButton(title: "Generate Report", icon: "doc.text", action: {})
-                QuickActionButton(title: "Log Incident", icon: "exclamationmark.triangle", action: {})
+                QuickActionButton(title: "Admit Client", icon: "person.crop.circle.badge.plus", action: {})
+                QuickActionButton(title: "Run Assessment", icon: "stethoscope", action: { navigateToAssessments = true })
+                QuickActionButton(title: "Open Caseload", icon: "person.2.fill", action: { navigateToClients = true })
+                QuickActionButton(title: "Create Report", icon: "doc.text.fill", action: {})
+                QuickActionButton(title: "Log Incident", icon: "exclamationmark.triangle.fill", action: {})
             }
         }
     }
 
     private var alertsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(CareLensTheme.Colors.riskRed)
-                Text("Alerts")
-                    .font(.headline)
-                    .foregroundStyle(CareLensTheme.Colors.textPrimary)
-            }
+            CareLensSectionTitle(
+                title: "Priority Alerts",
+                footnote: "Urgent assessments and safety flags needing attention today"
+            )
 
             let urgentAssessments = assessments.filter { $0.status == "Urgent" }
             if urgentAssessments.isEmpty {
-                DiamondGlassCard(title: "All Clear", subtitle: "No urgent items", icon: "checkmark.circle.fill") {
-                    DiamondStatusChip(text: "Stable", level: .safe)
+                DiamondGlassCard(title: "All Clear", subtitle: "No urgent clinical items right now", icon: "checkmark.circle.fill") {
+                    DiamondStatusChip(text: "Caseload stable", level: .safe)
                 }
             } else {
                 ForEach(urgentAssessments, id: \.id) { assessment in
@@ -78,19 +80,15 @@ struct DashboardView: View {
 
     private var caseloadOverview: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Caseload Overview")
-                .font(.headline)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
-                        startPoint: .leading, endPoint: .trailing
-                    )
-                )
+            CareLensSectionTitle(
+                title: "Caseload at a Glance",
+                footnote: "Tap a card to jump to clients or assessments"
+            )
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 Button(action: { navigateToClients = true }) {
                     FuturisticStatCard(
-                        title: "Total Clients",
+                        title: "Active Clients",
                         value: "\(clients.count)",
                         icon: "person.2.fill",
                         level: .info
@@ -100,7 +98,7 @@ struct DashboardView: View {
 
                 Button(action: { navigateToAssessments = true }) {
                     FuturisticStatCard(
-                        title: "Active Assessments",
+                        title: "In-Progress Screens",
                         value: "\(assessments.filter { $0.status != "Completed" }.count)",
                         icon: "checklist",
                         level: .warning
@@ -109,14 +107,14 @@ struct DashboardView: View {
                 .buttonStyle(.plain)
 
                 FuturisticStatCard(
-                    title: "Due Reviews",
+                    title: "Reviews Due (7d)",
                     value: "\(dueReviewCount)",
                     icon: "calendar.badge.exclamationmark",
                     level: .warning
                 )
 
                 FuturisticStatCard(
-                    title: "Recent Incidents",
+                    title: "Incidents (7d)",
                     value: "\(recentEvents.prefix(7).count)",
                     icon: "exclamationmark.triangle",
                     level: .risk
@@ -127,17 +125,13 @@ struct DashboardView: View {
 
     private var recentActivitySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity")
-                .font(.headline)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
-                        startPoint: .leading, endPoint: .trailing
-                    )
-                )
+            CareLensSectionTitle(
+                title: "Recent Monitoring",
+                footnote: "Latest observations logged across your caseload"
+            )
 
             if recentEvents.isEmpty {
-                DiamondGlassCard(title: "No Events", subtitle: "No recent monitoring events", icon: "clock") {
+                DiamondGlassCard(title: "No New Events", subtitle: "Monitoring activity will appear here", icon: "clock") {
                     EmptyView()
                 }
             } else {
@@ -168,17 +162,13 @@ struct DashboardView: View {
 
     private var dueReviewsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Due for Review")
-                .font(.headline)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
-                        startPoint: .leading, endPoint: .trailing
-                    )
-                )
+            CareLensSectionTitle(
+                title: "Scheduled Reviews",
+                footnote: "Follow-ups due in the next 7 days"
+            )
 
-            DiamondGlassCard(title: "Upcoming Reviews", subtitle: "Reviews scheduled within 7 days", icon: "calendar") {
-                Text("No reviews due this week")
+            DiamondGlassCard(title: "Upcoming Reviews", subtitle: "Based on last assessment date + 1 month", icon: "calendar") {
+                Text(dueReviewCount == 0 ? "No reviews due this week — great work." : "\(dueReviewCount) review(s) due soon")
                     .font(.caption)
                     .foregroundStyle(CareLensTheme.Colors.textTertiary)
             }
@@ -210,21 +200,22 @@ struct QuickActionButton: View {
                         )
                     )
                     .frame(width: 40, height: 40)
-                    .background(Color.white.opacity(0.06))
+                    .background(CareLensTheme.Colors.surfaceDeep)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 Text(title)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(CareLensTheme.Colors.textSecondary)
-                    .lineLimit(1)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(CareLensTheme.Colors.textPrimary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.85)
             }
             .frame(width: 80)
             .padding(.vertical, 10)
-            .background(.ultraThinMaterial)
-            .background(Color.white.opacity(0.03))
+            .background(CareLensTheme.Colors.surfaceElevated)
             .cornerRadius(14)
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+                    .strokeBorder(CareLensTheme.Colors.goldPrimary.opacity(0.35), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -245,20 +236,10 @@ struct FuturisticStatCard: View {
 
             Text(value)
                 .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.40, green: 0.45, blue: 0.92),
-                            Color(red: 0.65, green: 0.40, blue: 0.82),
-                            Color(red: 0.72, green: 0.52, blue: 0.35)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
+                .foregroundStyle(CareLensTheme.Colors.goldLight)
 
             Text(title)
-                .font(.caption)
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(CareLensTheme.Colors.textSecondary)
                 .multilineTextAlignment(.center)
         }

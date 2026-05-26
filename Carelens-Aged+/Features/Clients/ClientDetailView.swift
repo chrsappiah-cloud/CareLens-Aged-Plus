@@ -55,8 +55,7 @@ struct ClientDetailView: View {
         .background(Color.clear)
         .navigationTitle(client.fullName)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
     }
 
     private var overviewTab: some View {

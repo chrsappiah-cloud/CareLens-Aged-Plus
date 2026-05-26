@@ -15,6 +15,10 @@ struct ReportsHomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: CareLensTheme.sectionSpacing) {
+                    ScreenIntroHeader(
+                        title: AppTab.reports.screenTitle,
+                        subtitle: AppTab.reports.subtitle
+                    )
                     clientSelector
                     reportTypeSelector
 
@@ -29,9 +33,9 @@ struct ReportsHomeView: View {
                 .padding()
             }
             .background(Color.clear)
-            .navigationTitle("Reports")
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .navigationTitle(AppTab.reports.tabLabel)
+            .navigationBarTitleDisplayMode(.inline)
+            .careLensDarkChrome()
             .sheet(isPresented: $showingShareSheet) {
                 if let data = pdfData {
                     ShareSheet(items: [data])
@@ -42,7 +46,7 @@ struct ReportsHomeView: View {
 
     private var clientSelector: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Select Client")
+            CareLensSectionTitle(title: "Choose Client", footnote: "Reports are generated per client record")
                 .font(.headline)
                 .foregroundStyle(
                     LinearGradient(

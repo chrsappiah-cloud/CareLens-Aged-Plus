@@ -3,50 +3,51 @@ import SwiftData
 import CloudKit
 
 final class SyncCoordinatorService: SyncCoordinator {
-    private let cloudKit: CloudKitManager
-    private let supabase: SupabaseBackupService
-    private var lastSyncToken: CKServerChangeToken?
+    private let engine: DataSyncEngine
 
-    init(
-        cloudKit: CloudKitManager = CloudKitManager(),
-        supabase: SupabaseBackupService = SupabaseBackupService()
-    ) {
-        self.cloudKit = cloudKit
-        self.supabase = supabase
+    init(engine: DataSyncEngine = .shared) {
+        self.engine = engine
     }
 
     func performInitialSync() async throws {
-        try await cloudKit.createCustomZones()
-        try await cloudKit.setupPushSubscriptions()
+        try await engine.performInitialSync()
     }
 
     func syncPendingChanges() async throws {
-        let (changed, deleted, newToken) = try await cloudKit.fetchChanges(since: lastSyncToken)
-        if let newToken {
-            lastSyncToken = newToken
-        }
-        _ = changed
-        _ = deleted
+        try await engine.syncPendingCloudKitChanges()
     }
 
     func rebuildFromBackupIfNeeded() async throws {
-        let _ = try await supabase.fetchBackupRecords(table: "clients_backup")
+        _ = try await engine.rebuildFromBackupsIfNeeded()
     }
 
     func fullSync(
         clients: [ClientProfile],
         assessments: [AssessmentSession],
-        plans: [CarePlan]
+        plans: [CarePlan],
+        enableCloudKit: Bool = true,
+        enableCloudflare: Bool = true
     ) async throws {
-        try await cloudKit.performFullSync(
-            localClients: clients,
-            localAssessments: assessments,
-            localPlans: plans
-        )
-        try await supabase.performFullBackup(
+        let result = await engine.performEndToEndSync(
             clients: clients,
             assessments: assessments,
-            plans: plans
+            plans: plans,
+            enableCloudKit: enableCloudKit,
+            enableCloudflare: enableCloudflare
         )
+        guard result.primarySucceeded else {
+            throw SyncCoordinatorError.primarySyncFailed(result.primary.errorMessage)
+        }
+    }
+}
+
+enum SyncCoordinatorError: LocalizedError {
+    case primarySyncFailed(String?)
+
+    var errorDescription: String? {
+        switch self {
+        case .primarySyncFailed(let msg):
+            return "Primary database sync failed: \(msg ?? "unknown error")"
+        }
     }
 }

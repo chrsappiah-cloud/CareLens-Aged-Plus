@@ -5,16 +5,20 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+
 jobs:
   build-and-test:
-    name: Build & Test
+    name: Build & Unit Tests
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 35
 
     steps:
       - name: Checkout
@@ -26,37 +30,42 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
+      - name: Install xcbeautify
+        run: brew install xcbeautify || true
+
       - name: Resolve dependencies
         run: xcodebuild -resolvePackageDependencies -project "Carelens-Aged+.xcodeproj" -scheme "Carelens-Aged+"
 
-      - name: Build
+      - name: Build for testing
         run: |
-          xcodebuild build \
+          set -o pipefail
+          xcodebuild build-for-testing \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=latest" \
+            -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
-            | xcbeautify || true
+            | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
-      - name: Run Unit Tests
+      - name: Run unit tests (required)
         run: |
-          xcodebuild test \
+          set -o pipefail
+          xcodebuild test-without-building \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=latest" \
+            -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" \
             -only-testing:"Carelens-Aged+Tests" \
-            CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath TestResults.xcresult \
-            | xcbeautify || true
+            CODE_SIGNING_ALLOWED=NO \
+            | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
-      - name: Upload Test Results
+      - name: Upload unit test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
+          name: unit-test-results
           path: TestResults.xcresult
-          retention-days: 7
+          retention-days: 14
 
   ui-tests:
     name: UI Tests
@@ -71,27 +80,43 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
-      - name: Run UI Tests
+      - name: Install xcbeautify
+        run: brew install xcbeautify || true
+
+      - name: Build for testing
         run: |
-          xcodebuild test \
+          set -o pipefail
+          xcodebuild build-for-testing \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=latest" \
-            -only-testing:"Carelens-Aged+UITests" \
+            -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" \
+            -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
-            -resultBundlePath UITestResults.xcresult \
-            | xcbeautify || true
+            | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
-      - name: Upload UI Test Results
+      - name: Run UI tests (required)
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -project "Carelens-Aged+.xcodeproj" \
+            -scheme "Carelens-Aged+" \
+            -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" \
+            -only-testing:"Carelens-Aged+UITests/Carelens_Aged_UITests" \
+            -skip-testing:"Carelens-Aged+UITests/Carelens_Aged_ScreenshotTests" \
+            -resultBundlePath UITestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | (command -v xcbeautify >/dev/null && xcbeautify || cat)
+
+      - name: Upload UI test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ui-test-results
           path: UITestResults.xcresult
-          retention-days: 7
+          retention-days: 14
 
   code-quality:
-    name: Code Quality
+    name: Code Quality Gate
     runs-on: macos-15
     timeout-minutes: 10
 
@@ -99,26 +124,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check Swift formatting
+      - name: Swift TODO/FIXME budget
         run: |
-          if command -v swiftformat &> /dev/null; then
-            swiftformat --lint . || true
-          else
-            echo "SwiftFormat not installed, skipping"
+          TODOS=$(grep -rn "TODO" --include="*.swift" Carelens-Aged+ | wc -l | tr -d ' ')
+          FIXMES=$(grep -rn "FIXME" --include="*.swift" Carelens-Aged+ | wc -l | tr -d ' ')
+          echo "TODOs: $TODOS, FIXMEs: $FIXMES"
+          if [ "$FIXMES" -gt 20 ]; then
+            echo "Too many FIXME markers"
+            exit 1
           fi
 
-      - name: Check for TODOs and FIXMEs
+      - name: Verify Supabase schema present
+        run: test -f supabase/migrations/001_primary_schema.sql
+
+      - name: Verify Cloudflare worker example present
+        run: test -f cloudflare/worker-backup.example.js
+
+      - name: Verify deep-dark UI theme
         run: |
-          echo "=== Code Quality Report ==="
-          echo "TODOs found:"
-          grep -rn "TODO" --include="*.swift" . | wc -l || echo "0"
-          echo "FIXMEs found:"
-          grep -rn "FIXME" --include="*.swift" . | wc -l || echo "0"
+          test -f Carelens-Aged+/Theme/TabBarAppearance.swift
+          test -f Carelens-Aged+/Theme/DesignSystem.swift
+          grep -q "careLensDarkChrome" Carelens-Aged+/Theme/DesignSystem.swift
+          grep -q "tabBarBackground" Carelens-Aged+/Theme/DesignSystem.swift
 
   deploy-testflight:
     name: Deploy to TestFlight
     runs-on: macos-15
-    needs: [build-and-test, ui-tests]
+    needs: [build-and-test, ui-tests, code-quality]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     timeout-minutes: 45
     environment: production

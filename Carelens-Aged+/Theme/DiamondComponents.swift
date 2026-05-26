@@ -18,23 +18,23 @@ struct DiamondGlassCard<Content: View>: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .background(
-                    RoundedRectangle(cornerRadius: 22)
+                .fill(CareLensTheme.Colors.surfaceCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
                         .strokeBorder(
                             LinearGradient(
                                 colors: [
-                                    CareLensTheme.Colors.goldPrimary.opacity(0.5),
-                                    CareLensTheme.Colors.emeraldGreen.opacity(0.4),
-                                    CareLensTheme.Colors.goldLight.opacity(0.2)
+                                    CareLensTheme.Colors.goldPrimary.opacity(0.55),
+                                    CareLensTheme.Colors.emeraldGreen.opacity(0.35),
+                                    CareLensTheme.Colors.goldLight.opacity(0.25)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
                             lineWidth: 1.2
                         )
-                        .shadow(color: CareLensTheme.Colors.goldPrimary.opacity(0.15), radius: 16, x: 0, y: 12)
                 )
+                .shadow(color: .black.opacity(0.45), radius: 16, x: 0, y: 10)
                 .overlay(
                     DiamondShape()
                         .fill(
@@ -98,23 +98,13 @@ struct DiamondGlassCard<Content: View>: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(title)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0.40, green: 0.45, blue: 0.92),
-                                        Color(red: 0.65, green: 0.38, blue: 0.85),
-                                        Color(red: 0.75, green: 0.55, blue: 0.30)
-                                    ],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(CareLensTheme.Colors.textPrimary)
                             .lineLimit(2)
                         if let subtitle {
                             Text(subtitle)
                                 .font(.subheadline.weight(.medium))
-                                .foregroundStyle(Color.white.opacity(0.80))
+                                .foregroundStyle(CareLensTheme.Colors.textSecondary)
                                 .lineLimit(2)
                         }
                     }
@@ -179,7 +169,11 @@ struct DiamondStatusChip: View {
         .padding(.horizontal, 11)
         .background(
             Capsule()
-                .fill(Color.white.opacity(0.08))
+                .fill(CareLensTheme.Colors.surfaceElevated)
+                .overlay(
+                    Capsule()
+                        .strokeBorder(CareLensTheme.Colors.cardBorder.opacity(0.4), lineWidth: 0.5)
+                )
         )
     }
 }
@@ -189,8 +183,8 @@ struct DiamondStatusChip: View {
 struct DiamondButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.headline.weight(.semibold))
-            .foregroundColor(.white)
+            .font(.headline.weight(.bold))
+            .foregroundStyle(CareLensTheme.Colors.textPrimary)
             .padding(.vertical, 14)
             .padding(.horizontal, 22)
             .background(
@@ -199,8 +193,9 @@ struct DiamondButtonStyle: ButtonStyle {
                         .fill(
                             LinearGradient(
                                 colors: [
+                                    CareLensTheme.Colors.goldDeep,
                                     CareLensTheme.Colors.goldPrimary,
-                                    CareLensTheme.Colors.emeraldGreen
+                                    CareLensTheme.Colors.emeraldGreen.opacity(0.9)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -250,24 +245,75 @@ struct DiamondSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline.weight(.bold))
-            .foregroundColor(.white)
+            .foregroundStyle(CareLensTheme.Colors.textPrimary)
             .padding(.vertical, 12)
             .padding(.horizontal, 18)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.white.opacity(0.10))
+                    .fill(CareLensTheme.Colors.surfaceElevated)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .strokeBorder(
                         LinearGradient(
-                            colors: [CareLensTheme.Colors.goldPrimary.opacity(0.6), CareLensTheme.Colors.emeraldGreen.opacity(0.4)],
+                            colors: [
+                                CareLensTheme.Colors.goldLight.opacity(0.75),
+                                CareLensTheme.Colors.emeraldGreen.opacity(0.5)
+                            ],
                             startPoint: .topLeading, endPoint: .bottomTrailing
                         ),
-                        lineWidth: 1.2
+                        lineWidth: 1.4
                     )
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.22, dampingFraction: 0.75), value: configuration.isPressed)
+    }
+}
+
+// MARK: - Compact toolbar / sticky bar buttons
+
+struct CareLensToolbarButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.caption.weight(.bold))
+            .foregroundStyle(CareLensTheme.Colors.textPrimary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(CareLensTheme.Colors.surfaceElevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(CareLensTheme.Colors.goldPrimary.opacity(0.55), lineWidth: 1)
+            )
+            .opacity(configuration.isPressed ? 0.85 : 1)
+    }
+}
+
+struct CareLensProminentToolbarButtonStyle: ButtonStyle {
+    var accent: Color = CareLensTheme.Colors.emeraldGreen
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.caption.weight(.bold))
+            .foregroundStyle(CareLensTheme.Colors.textPrimary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [accent.opacity(0.95), CareLensTheme.Colors.goldDeep.opacity(0.85)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(CareLensTheme.Colors.goldLight.opacity(0.4), lineWidth: 0.8)
+            )
+            .opacity(configuration.isPressed ? 0.9 : 1)
     }
 }

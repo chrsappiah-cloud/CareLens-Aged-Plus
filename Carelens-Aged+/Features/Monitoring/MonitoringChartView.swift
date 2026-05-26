@@ -51,8 +51,7 @@ struct MonitoringChartView: View {
         .background(Color.clear)
         .navigationTitle("Monitoring")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .careLensDarkChrome()
         .sheet(isPresented: $showingIncidentLog) {
             IncidentLogView(client: client)
         }

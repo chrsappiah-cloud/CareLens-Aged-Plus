@@ -32,8 +32,7 @@ struct SubscriptionStoreView: View {
             .background(Color.clear)
             .navigationTitle("Subscription Plans")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .careLensDarkChrome()
             .alert("Confirm Purchase", isPresented: $showingConfirmation) {
                 Button("Purchase with Apple Pay") {
                     if let product = selectedProduct {

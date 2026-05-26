@@ -4,19 +4,18 @@ import SwiftData
 @main
 struct Carelens_Aged_App: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            ClientProfile.self,
-            AssessmentSession.self,
-            AssessmentSection.self,
-            CarePlan.self,
-            MonitoringEvent.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
+            let schema = Schema([
+                ClientProfile.self,
+                AssessmentSession.self,
+                AssessmentSection.self,
+                CarePlan.self,
+                MonitoringEvent.self,
+            ])
+            let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("CarelensApp ModelContainer: \(error)")
         }
     }()
 
@@ -24,26 +23,7 @@ struct Carelens_Aged_App: App {
     @AppStorage("hasLoadedMockData") private var hasLoadedMockData = false
 
     init() {
-        let tabBarAppearance = UITabBarAppearance()
-        tabBarAppearance.configureWithOpaqueBackground()
-        tabBarAppearance.backgroundEffect = UIBlurEffect(style: .systemChromeMaterialDark)
-        tabBarAppearance.backgroundColor = UIColor(Color.black.opacity(0.55))
-
-        let selectedColor = UIColor(red: 0.95, green: 0.85, blue: 0.35, alpha: 1.0)
-        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = selectedColor
-        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-            .foregroundColor: selectedColor,
-            .font: UIFont.systemFont(ofSize: 10, weight: .bold)
-        ]
-
-        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white.withAlphaComponent(0.75)
-        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-            .foregroundColor: UIColor.white.withAlphaComponent(0.75),
-            .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
-        ]
-
-        UITabBar.appearance().standardAppearance = tabBarAppearance
-        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        TabBarAppearance.apply()
     }
 
     var body: some Scene {
@@ -63,6 +43,7 @@ struct Carelens_Aged_App: App {
                 }
             }
             .environmentObject(authService)
+            .preferredColorScheme(.dark)
         }
         .modelContainer(sharedModelContainer)
     }
