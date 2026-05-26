@@ -14,6 +14,12 @@ if [ -n "${DEVICE_ID:-}" ]; then
   xcrun simctl bootstatus "$DEVICE_ID" -b 2>/dev/null || true
 fi
 
-# Placeholder destination works when a specific UDID is not registered with xcodebuild.
 echo "SIM_DESTINATION=generic/platform=iOS Simulator" >> "${GITHUB_ENV:?GITHUB_ENV not set}"
-echo "Using generic/platform=iOS Simulator (CI deployment target override)"
+
+if [ -n "${DEVICE_ID:-}" ]; then
+  echo "SIM_TEST_DESTINATION=platform=iOS Simulator,id=${DEVICE_ID}" >> "${GITHUB_ENV}"
+  echo "Build: generic/platform=iOS Simulator | Tests: id=${DEVICE_ID}"
+else
+  echo "SIM_TEST_DESTINATION=generic/platform=iOS Simulator" >> "${GITHUB_ENV}"
+  echo "Warning: no iPhone simulator UDID; tests may fail"
+fi

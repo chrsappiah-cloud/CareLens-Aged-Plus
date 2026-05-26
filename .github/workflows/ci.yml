@@ -59,7 +59,7 @@ jobs:
           xcodebuild test-without-building \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "$SIM_DESTINATION" \
+            -destination "${SIM_TEST_DESTINATION:-$SIM_DESTINATION}" \
             -only-testing:"Carelens-Aged+Tests" \
             -resultBundlePath TestResults.xcresult \
             IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
@@ -111,7 +111,7 @@ jobs:
           xcodebuild test-without-building \
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
-            -destination "$SIM_DESTINATION" \
+            -destination "${SIM_TEST_DESTINATION:-$SIM_DESTINATION}" \
             -only-testing:"Carelens-Aged+UITests/Carelens_Aged_UITests" \
             -skip-testing:"Carelens-Aged+UITests/Carelens_Aged_ScreenshotTests" \
             -resultBundlePath UITestResults.xcresult \
