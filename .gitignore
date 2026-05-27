@@ -30,6 +30,7 @@ fastlane/test_output
 # Test results
 *.xcresult
 result.xcresult/
+TestResults/
 
 # OS files
 .DS_Store
