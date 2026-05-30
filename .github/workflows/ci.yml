@@ -53,6 +53,11 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
+      - name: Verify device E2E scripts present
+        run: |
+          test -x scripts/run_e2e_device_tests.sh
+          test -x scripts/run_e2e_device_systematic.sh
+
       - name: Verify E2E test plan includes foundations
         run: grep -q "FoundationsTests" E2ETests.xctestplan
 

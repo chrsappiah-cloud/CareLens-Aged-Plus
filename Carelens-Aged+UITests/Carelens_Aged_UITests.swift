@@ -7,17 +7,29 @@ final class Carelens_Aged_UITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launch()
     }
 
     override func tearDownWithError() throws {
+        app.terminate()
         app = nil
+    }
+
+    private func launchForLoginTests() {
+        app.launchArguments = []
+        app.launch()
+    }
+
+    private func launchAuthenticated() {
+        app.launchArguments = ["-UITesting"]
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Home"].waitForExistence(timeout: 10))
     }
 
     // MARK: - Login Tests
 
     @MainActor
     func testLoginScreenAppears() throws {
+        launchForLoginTests()
         XCTAssertTrue(app.staticTexts["CareLens Aged+"].exists)
         XCTAssertTrue(app.staticTexts["Intelligent aged care for clinicians & care teams"].exists)
     }
@@ -25,6 +37,7 @@ final class Carelens_Aged_UITests: XCTestCase {
     /// Smoke test for deep-dark theme: primary actions remain visible on login.
     @MainActor
     func testDarkThemeLoginControlsVisible() throws {
+        launchForLoginTests()
         XCTAssertTrue(app.staticTexts["CareLens Aged+"].waitForExistence(timeout: 5))
         let signIn = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Sign In'")).firstMatch
         XCTAssertTrue(signIn.waitForExistence(timeout: 5))
@@ -34,16 +47,19 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testDemoCredentialButtonsExist() throws {
+        launchForLoginTests()
         XCTAssertTrue(app.staticTexts["Quick demo sign-in"].exists)
     }
 
     @MainActor
     func testSignInButtonExists() throws {
+        launchForLoginTests()
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS 'Sign In'")).count > 0)
     }
 
     @MainActor
     func testAdminLoginFlow() throws {
+        launchForLoginTests()
         let adminButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'admin@carelens.health'")).firstMatch
         if adminButton.exists {
             adminButton.tap()
@@ -60,6 +76,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testCliniciainLoginFlow() throws {
+        launchForLoginTests()
         let clinicianButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'clinician@carelens.health'")).firstMatch
         if clinicianButton.exists {
             clinicianButton.tap()
@@ -78,7 +95,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testTabBarNavigation() throws {
-        loginAsAdmin()
+        launchAuthenticated()
 
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 5))
@@ -95,7 +112,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testAdminPanelInSettingsForAdmin() throws {
-        loginAsAdmin()
+        launchAuthenticated()
         let settingsTab = app.tabBars.buttons["Settings"]
         XCTAssertTrue(settingsTab.waitForExistence(timeout: 5))
         settingsTab.tap()
@@ -105,7 +122,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testAdmitTabExists() throws {
-        loginAsAdmin()
+        launchAuthenticated()
         let admitTab = app.tabBars.buttons["Admit"]
         XCTAssertTrue(admitTab.waitForExistence(timeout: 5))
     }
@@ -114,7 +131,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testDashboardLoads() throws {
-        loginAsAdmin()
+        launchAuthenticated()
         let dashboardTab = app.tabBars.buttons["Home"]
         dashboardTab.tap()
         sleep(1)
@@ -125,7 +142,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testIntakeFormNavigation() throws {
-        loginAsAdmin()
+        launchAuthenticated()
         let intakeTab = app.tabBars.buttons["Admit"]
         if intakeTab.exists {
             intakeTab.tap()
@@ -142,7 +159,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testSettingsShowsAccountInfo() throws {
-        loginAsAdmin()
+        launchAuthenticated()
         let settingsTab = app.tabBars.buttons["Settings"]
         if settingsTab.exists {
             settingsTab.tap()
@@ -154,7 +171,7 @@ final class Carelens_Aged_UITests: XCTestCase {
 
     @MainActor
     func testSignOutButton() throws {
-        loginAsAdmin()
+        launchAuthenticated()
         let settingsTab = app.tabBars.buttons["Settings"]
         if settingsTab.exists {
             settingsTab.tap()
@@ -169,21 +186,8 @@ final class Carelens_Aged_UITests: XCTestCase {
     @MainActor
     func testLaunchPerformance() throws {
         measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
-    }
-
-    // MARK: - Helpers
-
-    private func loginAsAdmin() {
-        let adminButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'admin@carelens.health'")).firstMatch
-        if adminButton.waitForExistence(timeout: 3) {
-            adminButton.tap()
-            let signInButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Sign In'")).firstMatch
-            if signInButton.waitForExistence(timeout: 2) && signInButton.isEnabled {
-                signInButton.tap()
-                sleep(2)
-            }
+            let launchApp = XCUIApplication()
+            launchApp.launch()
         }
     }
 }
