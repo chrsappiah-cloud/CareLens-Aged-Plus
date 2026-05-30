@@ -56,7 +56,13 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgumentsEnv = "YES"
       shouldUseLaunchSchemeArgsEnv = "NO"
-      shouldAutocreateTestPlan = "YES">
+      shouldAutocreateTestPlan = "NO">
+      <TestPlans>
+         <TestPlanReference
+            reference = "container:E2ETests.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+      </TestPlans>
       <Testables>
          <TestableReference
             skipped = "NO"
@@ -81,10 +87,6 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <TestPlanReference
-         reference = "container:E2ETests.xctestplan"
-         default = "YES">
-      </TestPlanReference>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
