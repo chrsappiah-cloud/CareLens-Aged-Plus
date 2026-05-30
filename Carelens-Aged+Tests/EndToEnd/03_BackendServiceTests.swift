@@ -7,7 +7,7 @@ import Foundation
 final class AuthenticationServiceTests: XCTestCase {
     @MainActor
     func testAdminLogin() async {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let r = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
         XCTAssertTrue(r)
         XCTAssertTrue(auth.isAuthenticated)
@@ -16,7 +16,7 @@ final class AuthenticationServiceTests: XCTestCase {
     }
     @MainActor
     func testClinicianLogin() async {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let r = await auth.login(email: "clinician@carelens.health", password: "password123")
         XCTAssertTrue(r)
         XCTAssertEqual(auth.currentUser?.role, .clinician)
@@ -24,14 +24,14 @@ final class AuthenticationServiceTests: XCTestCase {
     }
     @MainActor
     func testInvalidLogin() async {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let r = await auth.login(email: "x@y.com", password: "wrong")
         XCTAssertFalse(r)
         XCTAssertFalse(auth.isAuthenticated)
     }
     @MainActor
     func testValidation() async {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let r1 = await auth.login(email: "", password: "pass123")
         XCTAssertFalse(r1)
         let r2 = await auth.login(email: "t@t.com", password: "12345")
@@ -41,7 +41,7 @@ final class AuthenticationServiceTests: XCTestCase {
     }
     @MainActor
     func testLogout() async {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
         auth.logout()
         XCTAssertFalse(auth.isAuthenticated)
@@ -49,7 +49,7 @@ final class AuthenticationServiceTests: XCTestCase {
     }
     @MainActor
     func testAccess() async {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
         XCTAssertTrue(auth.isAdmin())
         XCTAssertTrue(auth.hasAccess(to: .adminPanel))

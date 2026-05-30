@@ -44,7 +44,8 @@
         "Carelens_Aged_Tests/ReportServiceTests",
         "Carelens_Aged_Tests/AppEnvironmentTests",
         "Carelens_Aged_Tests/RepositoriesProtocolTests",
-        "Carelens_Aged_Tests/ThemeUnitTests"
+        "Carelens_Aged_Tests/ThemeUnitTests",
+        "Carelens_Aged_Tests/FoundationsTests"
       ]
     }
   ],

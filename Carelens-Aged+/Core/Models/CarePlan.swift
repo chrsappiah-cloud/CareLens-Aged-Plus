@@ -18,6 +18,8 @@ final class CarePlan {
     var createdAt: Date
     var updatedAt: Date
 
+    var client: ClientProfile?
+
     init(
         id: String = UUID().uuidString,
         clientID: String,

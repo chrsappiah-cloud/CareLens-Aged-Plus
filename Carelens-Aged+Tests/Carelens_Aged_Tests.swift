@@ -7,7 +7,7 @@ import Foundation
 struct AuthenticationTests {
 
     @Test @MainActor func adminLoginSucceeds() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let result = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
         #expect(result == true)
         #expect(auth.isAuthenticated == true)
@@ -16,14 +16,14 @@ struct AuthenticationTests {
     }
 
     @Test @MainActor func adminLoginWrongPasswordFails() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let result = await auth.login(email: "admin@carelens.health", password: "wrong")
         #expect(result == false)
         #expect(auth.isAuthenticated == false)
     }
 
     @Test @MainActor func clinicianLoginSucceeds() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let result = await auth.login(email: "clinician@carelens.health", password: "password123")
         #expect(result == true)
         #expect(auth.currentUser?.role == .clinician)
@@ -31,25 +31,25 @@ struct AuthenticationTests {
     }
 
     @Test @MainActor func emptyEmailFails() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let result = await auth.login(email: "", password: "password123")
         #expect(result == false)
     }
 
     @Test @MainActor func shortPasswordFails() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let result = await auth.login(email: "test@test.com", password: "12345")
         #expect(result == false)
     }
 
     @Test @MainActor func emailWithoutAtSignFails() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         let result = await auth.login(email: "testuser", password: "password123")
         #expect(result == false)
     }
 
     @Test @MainActor func logoutClearsState() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
         auth.logout()
         #expect(auth.isAuthenticated == false)
@@ -57,19 +57,19 @@ struct AuthenticationTests {
     }
 
     @Test @MainActor func isAdminReturnsTrueForAdmin() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
         #expect(auth.isAdmin() == true)
     }
 
     @Test @MainActor func isAdminReturnsFalseForClinician() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "clinician@carelens.health", password: "password123")
         #expect(auth.isAdmin() == false)
     }
 
     @Test @MainActor func hasAccessChecksSubscriptionTier() async throws {
-        let auth = AuthenticationService()
+        let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "clinician@carelens.health", password: "password123")
         #expect(auth.hasAccess(to: .aiInsights) == true)
         #expect(auth.hasAccess(to: .adminPanel) == false)

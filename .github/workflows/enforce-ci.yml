@@ -1,0 +1,37 @@
+name: Enforce CI on main
+
+on:
+  workflow_dispatch:
+
+permissions:
+  administration: write
+  contents: read
+
+jobs:
+  protect-main:
+    name: Configure branch protection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require CI status checks on main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/branches/main/protection \
+            --method PUT \
+            --input - <<'EOF'
+          {
+            "required_status_checks": {
+              "strict": true,
+              "checks": [
+                {"context": "Build & Unit Tests"},
+                {"context": "UI Tests"},
+                {"context": "Code Quality Gate"}
+              ]
+            },
+            "enforce_admins": true,
+            "required_pull_request_reviews": null,
+            "restrictions": null,
+            "allow_force_pushes": false,
+            "allow_deletions": false
+          }
+          EOF

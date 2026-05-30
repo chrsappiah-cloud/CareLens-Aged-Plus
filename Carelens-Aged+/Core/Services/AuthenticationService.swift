@@ -43,19 +43,45 @@ class AuthenticationService: ObservableObject {
 
     static let shared = AuthenticationService()
 
-    private let adminCredentials: [(email: String, password: String)] = [
-        ("admin@carelens.health", "CareLens2026!"),
-    ]
+    private let subscriptionAccess: any SubscriptionAccessProviding
+    private let loginDelayNanoseconds: UInt64
+    private let adminCredentials: [(email: String, password: String)]
+
+    init(
+        subscriptionAccess: (any SubscriptionAccessProviding)? = nil,
+        loginDelayNanoseconds: UInt64 = 800_000_000,
+        adminCredentials: [(email: String, password: String)] = [("admin@carelens.health", "CareLens2026!")]
+    ) {
+        self.subscriptionAccess = subscriptionAccess ?? SubscriptionManager.shared
+        self.loginDelayNanoseconds = loginDelayNanoseconds
+        self.adminCredentials = adminCredentials
+
+        if ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            currentUser = AppUser(
+                id: "uitest-admin",
+                email: "admin@carelens.health",
+                displayName: "System Administrator",
+                role: .admin,
+                subscriptionTier: .enterprise,
+                isActive: true,
+                facilityID: "facility_001",
+                createdAt: .now,
+                lastLoginAt: .now
+            )
+            isAuthenticated = true
+        }
+    }
 
     func login(email: String, password: String) async -> Bool {
         isLoading = true
         errorMessage = nil
 
-        if !ProcessInfo.processInfo.arguments.contains("-UITesting") {
-            try? await Task.sleep(nanoseconds: 800_000_000)
+        if loginDelayNanoseconds > 0,
+           !ProcessInfo.processInfo.arguments.contains("-UITesting") {
+            try? await Task.sleep(nanoseconds: loginDelayNanoseconds)
         }
 
-        if let _ = adminCredentials.first(where: { $0.email == email && $0.password == password }) {
+        if adminCredentials.contains(where: { $0.email == email && $0.password == password }) {
             currentUser = AppUser(
                 id: UUID().uuidString,
                 email: email,
@@ -105,7 +131,7 @@ class AuthenticationService: ObservableObject {
 
     func hasAccess(to feature: AppFeature) -> Bool {
         guard let user = currentUser else { return false }
-        return SubscriptionManager.shared.canAccess(feature: feature, tier: user.subscriptionTier)
+        return subscriptionAccess.canAccess(feature: feature, tier: user.subscriptionTier)
     }
 
     private func isValidUserCredentials(email: String, password: String) -> Bool {
@@ -115,5 +141,16 @@ class AuthenticationService: ObservableObject {
     private func extractName(from email: String) -> String {
         let name = email.components(separatedBy: "@").first ?? "User"
         return name.replacingOccurrences(of: ".", with: " ").capitalized
+    }
+}
+
+extension AuthenticationService {
+    static func makeForTesting(
+        subscriptionAccess: (any SubscriptionAccessProviding)? = nil
+    ) -> AuthenticationService {
+        AuthenticationService(
+            subscriptionAccess: subscriptionAccess ?? SubscriptionManager(),
+            loginDelayNanoseconds: 0
+        )
     }
 }

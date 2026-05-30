@@ -57,10 +57,6 @@
       shouldUseLaunchSchemeArgumentsEnv = "YES"
       shouldUseLaunchSchemeArgsEnv = "NO"
       shouldAutocreateTestPlan = "YES">
-      <TestPlanReference
-         reference = "container:E2ETests.xctestplan"
-         default = "YES">
-      </TestPlanReference>
       <Testables>
          <TestableReference
             skipped = "NO"
@@ -85,6 +81,10 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <TestPlanReference
+         reference = "container:E2ETests.xctestplan"
+         default = "YES">
+      </TestPlanReference>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
