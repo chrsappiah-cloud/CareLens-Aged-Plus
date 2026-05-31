@@ -15,7 +15,7 @@ final class Carelens_Aged_ScreenshotTests: XCTestCase {
 
     @MainActor
     func testCaptureAppStoreScreenshots() throws {
-        XCTAssertTrue(waitForTab("tab_dashboard", fallbackLabel: "Dashboard"), "Dashboard did not load")
+        XCTAssertTrue(waitForTab("tab_dashboard", fallbackLabel: "Home"), "Dashboard did not load")
 
         capture("01_Dashboard", tab: "tab_dashboard", fallbackLabel: "Home")
         capture("02_Clients", tab: "tab_clients", fallbackLabel: "Clients")

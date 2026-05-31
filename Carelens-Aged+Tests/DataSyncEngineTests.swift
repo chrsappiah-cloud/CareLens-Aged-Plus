@@ -130,7 +130,7 @@ struct MiddlewareSyncTests {
             try await middleware.syncData(clients: [], assessments: [], plans: [], userTier: .free)
             #expect(Bool(false), "Should throw")
         } catch {
-            #expect(error.localizedDescription.contains("subscription") || error.localizedDescription.contains("tier") || error.localizedDescription.contains("feature"))
+            #expect(error.localizedDescription.contains("access tier") || error.localizedDescription.contains("tier") || error.localizedDescription.contains("feature"))
         }
     }
 
@@ -149,19 +149,19 @@ struct MiddlewareSyncTests {
     }
 }
 
-// MARK: - Subscription tier sync features
+// MARK: - Access tier sync features
 
-struct SubscriptionSyncFeatureTests {
+struct AccessTierSyncFeatureTests {
 
     @Test @MainActor func starterHasPrimaryAndCloudKit() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         #expect(manager.canAccess(feature: .supabasePrimary, tier: .starter))
         #expect(manager.canAccess(feature: .cloudSync, tier: .starter))
         #expect(manager.canAccess(feature: .cloudflareBackup, tier: .starter) == false)
     }
 
     @Test @MainActor func professionalHasCloudflare() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         #expect(manager.canAccess(feature: .cloudflareBackup, tier: .professional))
     }
 }

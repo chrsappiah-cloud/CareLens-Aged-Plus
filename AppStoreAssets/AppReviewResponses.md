@@ -25,18 +25,7 @@ Screenshots are captured from the production UI using UI tests on iPhone 17 Pro 
 
 ## Guideline 3.1.1 — In-App Purchase
 
-Subscription products (StoreKit):
-
-| Product ID | Tier |
-|------------|------|
-| `com.carelens.aged.starter.monthly` | Starter Monthly |
-| `com.carelens.aged.starter.annual` | Starter Annual |
-| `com.carelens.aged.professional.monthly` | Professional Monthly |
-| `com.carelens.aged.professional.annual` | Professional Annual |
-| `com.carelens.aged.enterprise.monthly` | Enterprise Monthly |
-| `com.carelens.aged.enterprise.annual` | Enterprise Annual |
-
-Reviewers can use the demo admin account without purchasing. Restore Purchases is available in Settings → Upgrade Plan.
+This version does not offer in-app purchases. Access tiers are assigned by organisation administrators. Reviewers can use the demo admin account with Enterprise access — no purchase is required.
 
 ## Guideline 5.1.1 — Privacy / Health Data
 

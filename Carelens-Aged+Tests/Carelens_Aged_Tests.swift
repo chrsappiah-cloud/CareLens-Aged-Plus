@@ -12,7 +12,7 @@ struct AuthenticationTests {
         #expect(result == true)
         #expect(auth.isAuthenticated == true)
         #expect(auth.currentUser?.role == .admin)
-        #expect(auth.currentUser?.subscriptionTier == .enterprise)
+        #expect(auth.currentUser?.accessTier == .enterprise)
     }
 
     @Test @MainActor func adminLoginWrongPasswordFails() async throws {
@@ -27,7 +27,7 @@ struct AuthenticationTests {
         let result = await auth.login(email: "clinician@carelens.health", password: "password123")
         #expect(result == true)
         #expect(auth.currentUser?.role == .clinician)
-        #expect(auth.currentUser?.subscriptionTier == .professional)
+        #expect(auth.currentUser?.accessTier == .professional)
     }
 
     @Test @MainActor func emptyEmailFails() async throws {
@@ -68,7 +68,7 @@ struct AuthenticationTests {
         #expect(auth.isAdmin() == false)
     }
 
-    @Test @MainActor func hasAccessChecksSubscriptionTier() async throws {
+    @Test @MainActor func hasAccessChecksAccessTier() async throws {
         let auth = AuthenticationService.makeForTesting()
         _ = await auth.login(email: "clinician@carelens.health", password: "password123")
         #expect(auth.hasAccess(to: .aiInsights) == true)
@@ -76,59 +76,52 @@ struct AuthenticationTests {
     }
 }
 
-// MARK: - Subscription Manager Tests
+// MARK: - Access Manager Tests
 
-struct SubscriptionManagerTests {
+struct AccessManagerTests {
 
     @Test @MainActor func freeAccessLimited() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         #expect(manager.canAccess(feature: .aiInsights, tier: .free) == false)
         #expect(manager.canAccess(feature: .dashboard, tier: .free) == true)
     }
 
     @Test @MainActor func starterAccessMiddleTier() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         #expect(manager.canAccess(feature: .neuroWatch, tier: .starter) == true)
         #expect(manager.canAccess(feature: .aiInsights, tier: .starter) == false)
     }
 
     @Test @MainActor func professionalAccessBroad() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         #expect(manager.canAccess(feature: .aiInsights, tier: .professional) == true)
         #expect(manager.canAccess(feature: .monitoring, tier: .professional) == true)
         #expect(manager.canAccess(feature: .adminPanel, tier: .professional) == false)
     }
 
     @Test @MainActor func enterpriseAccessAll() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         for feature in AppFeature.allCases {
             #expect(manager.canAccess(feature: feature, tier: .enterprise) == true, "Enterprise should access \(feature.rawValue)")
         }
     }
 
     @Test func tierMaxClients() {
-        #expect(SubscriptionTier.free.maxClients == 3)
-        #expect(SubscriptionTier.starter.maxClients == 15)
-        #expect(SubscriptionTier.professional.maxClients == 100)
-        #expect(SubscriptionTier.enterprise.maxClients == Int.max)
+        #expect(AccessTier.free.maxClients == 3)
+        #expect(AccessTier.starter.maxClients == 15)
+        #expect(AccessTier.professional.maxClients == 100)
+        #expect(AccessTier.enterprise.maxClients == Int.max)
     }
 
-    @Test func tierMonthlyPricing() {
-        #expect(SubscriptionTier.free.monthlyPrice == 0)
-        #expect(SubscriptionTier.starter.monthlyPrice == 29.99)
-        #expect(SubscriptionTier.professional.monthlyPrice == 79.99)
-        #expect(SubscriptionTier.enterprise.monthlyPrice == 199.99)
-    }
-
-    @Test @MainActor func upgradeUser() {
-        let manager = SubscriptionManager()
-        manager.upgradeUser("u2", to: .professional)
+    @Test @MainActor func setAccessTier() {
+        let manager = AccessManager()
+        manager.setAccessTier(for: "u2", to: .professional)
         let user = manager.managedUsers.first(where: { $0.id == "u2" })
-        #expect(user?.subscriptionTier == .professional)
+        #expect(user?.accessTier == .professional)
     }
 
     @Test @MainActor func toggleUserActive() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         let wasActive = manager.managedUsers.first(where: { $0.id == "u4" })?.isActive ?? true
         manager.toggleUserActive("u4")
         let isActive = manager.managedUsers.first(where: { $0.id == "u4" })?.isActive ?? false
@@ -136,13 +129,13 @@ struct SubscriptionManagerTests {
     }
 
     @Test @MainActor func addAndRemoveUser() {
-        let manager = SubscriptionManager()
+        let manager = AccessManager()
         let newUser = AppUser(
             id: "test_user",
             email: "test@test.com",
             displayName: "Test User",
             role: .clinician,
-            subscriptionTier: .starter,
+            accessTier: .starter,
             isActive: true,
             facilityID: nil,
             createdAt: .now,
@@ -223,59 +216,6 @@ struct HealthAPIServiceTests {
     }
 }
 
-// MARK: - Apple Pay Subscription Tests
-
-struct ApplePaySubscriptionTests {
-
-    @Test @MainActor func purchaseSubscription() async {
-        let store = ApplePaySubscriptionService()
-        await store.purchase(.professionalMonthly)
-        #expect(store.purchasedSubscription == .professionalMonthly)
-        #expect(store.transactionStatus == .success)
-        #expect(AuthenticationService.shared.currentUser?.subscriptionTier == .professional || AuthenticationService.shared.currentUser == nil)
-    }
-
-    @Test @MainActor func purchaseUpdatesAuthTierWhenLoggedIn() async {
-        let auth = AuthenticationService.shared
-        _ = await auth.login(email: "admin@carelens.health", password: "CareLens2026!")
-        let store = ApplePaySubscriptionService()
-        await store.purchase(.starterMonthly)
-        #expect(auth.currentUser?.subscriptionTier == .starter)
-    }
-
-    @Test func subscriptionProductTierMapping() {
-        #expect(SubscriptionProduct.starterMonthly.tier == .starter)
-        #expect(SubscriptionProduct.starterAnnual.tier == .starter)
-        #expect(SubscriptionProduct.professionalMonthly.tier == .professional)
-        #expect(SubscriptionProduct.professionalAnnual.tier == .professional)
-        #expect(SubscriptionProduct.enterpriseMonthly.tier == .enterprise)
-        #expect(SubscriptionProduct.enterpriseAnnual.tier == .enterprise)
-    }
-
-    @Test func subscriptionProductPricing() {
-        #expect(SubscriptionProduct.starterMonthly.price == "$29.99/mo")
-        #expect(SubscriptionProduct.starterAnnual.price == "$299.99/yr")
-        #expect(SubscriptionProduct.professionalMonthly.price == "$79.99/mo")
-        #expect(SubscriptionProduct.enterpriseMonthly.price == "$199.99/mo")
-    }
-
-    @Test func annualSavingsAvailable() {
-        #expect(SubscriptionProduct.starterAnnual.savings != nil)
-        #expect(SubscriptionProduct.professionalAnnual.savings != nil)
-        #expect(SubscriptionProduct.starterMonthly.savings == nil)
-    }
-
-    @Test @MainActor func restorePurchases() async {
-        let store = ApplePaySubscriptionService()
-        await store.restorePurchases()
-        if case .restored = store.transactionStatus {
-            // pass
-        } else {
-            #expect(Bool(false), "Expected restored status")
-        }
-    }
-}
-
 // MARK: - Network Middleware Tests
 
 struct NetworkMiddlewareTests {
@@ -337,17 +277,17 @@ struct AppFeatureTests {
     }
 
     @Test func featureCountPerTier() {
-        #expect(SubscriptionTier.free.features.count == 3)
-        #expect(SubscriptionTier.starter.features.count == 8)
-        #expect(SubscriptionTier.professional.features.count == 15)
-        #expect(SubscriptionTier.enterprise.features.count == AppFeature.allCases.count)
+        #expect(AccessTier.free.features.count == 3)
+        #expect(AccessTier.starter.features.count == 8)
+        #expect(AccessTier.professional.features.count == 15)
+        #expect(AccessTier.enterprise.features.count == AppFeature.allCases.count)
     }
 
     @Test func higherTiersContainLowerTierFeatures() {
-        let freeFeatures = Set(SubscriptionTier.free.features)
-        let starterFeatures = Set(SubscriptionTier.starter.features)
-        let proFeatures = Set(SubscriptionTier.professional.features)
-        let enterpriseFeatures = Set(SubscriptionTier.enterprise.features)
+        let freeFeatures = Set(AccessTier.free.features)
+        let starterFeatures = Set(AccessTier.starter.features)
+        let proFeatures = Set(AccessTier.professional.features)
+        let enterpriseFeatures = Set(AccessTier.enterprise.features)
 
         #expect(freeFeatures.isSubset(of: starterFeatures))
         #expect(starterFeatures.isSubset(of: proFeatures))

@@ -33,7 +33,7 @@ struct UnitItem {
 
 let categories: [UnitCategory] = [
     // MARK: - Enums
-    UnitCategory(name: "SubscriptionTier", description: "Business pricing & feature tiers", items: [
+    UnitCategory(name: "AccessTier", description: "Organisation access & feature tiers", items: [
         UnitItem(name: "free", description: "Free tier — 3 clients, 3 features", values: ["Price: $0/mo", "Max Clients: 3", "Features: dashboard, clientProfiles, basicAssessment"], status: "✓"),
         UnitItem(name: "starter", description: "Starter tier — 15 clients, 8 features", values: ["Price: $29.99/mo", "Max Clients: 15"], status: "✓"),
         UnitItem(name: "professional", description: "Professional tier — 100 clients, 15 features", values: ["Price: $79.99/mo", "Max Clients: 100"], status: "✓"),
@@ -69,11 +69,6 @@ let categories: [UnitCategory] = [
         UnitItem(name: "Progressive Concern", description: "Score 15-23 — comprehensive assessment", values: ["Action: Comprehensive assessment", "Color: orange"], status: "✓"),
         UnitItem(name: "Urgent Delirium Rule-Out", description: "Score 24+ — immediate medical", values: ["Action: Immediate medical review", "Color: red"], status: "✓"),
     ]),
-    UnitCategory(name: "SubscriptionProduct", description: "6 in-app purchase products", items: [
-        UnitItem(name: "Starter Monthly/Annual", description: "$29.99/mo or $299.99/yr", values: ["Annual saves 17%"], status: "✓"),
-        UnitItem(name: "Professional Monthly/Annual", description: "$79.99/mo or $799.99/yr", values: ["Annual saves 17%"], status: "✓"),
-        UnitItem(name: "Enterprise Monthly/Annual", description: "$199.99/mo or $1,999.99/yr", values: ["Annual saves 17%"], status: "✓"),
-    ]),
     UnitCategory(name: "ReportType", description: "4 report templates", items: [
         UnitItem(name: "Clinical Assessment Report", description: "Full clinical documentation", values: [], status: "✓"),
         UnitItem(name: "Family Summary", description: "Plain-language family update", values: [], status: "✓"),
@@ -107,18 +102,17 @@ let categories: [UnitCategory] = [
     ]),
 
     // MARK: - Services
-    UnitCategory(name: "SERVICES (Backend)", description: "11 core services", items: [
-        UnitItem(name: "AuthenticationService", description: "Login/logout, role gating, subscription check", values: ["admin + clinician credentials"], status: "✓"),
-        UnitItem(name: "SubscriptionManager", description: "Feature access control, user CRUD", values: ["4 tiers x 19 features matrix"], status: "✓"),
+    UnitCategory(name: "SERVICES (Backend)", description: "10 core services", items: [
+        UnitItem(name: "AuthenticationService", description: "Login/logout, role gating, access check", values: ["admin + clinician credentials"], status: "✓"),
+        UnitItem(name: "AccessManager", description: "Feature access control, user CRUD", values: ["4 tiers x 19 features matrix"], status: "✓"),
         UnitItem(name: "NeuroWatchEngine", description: "Cognitive screening evaluation engine", values: ["9 inputs -> score -> band + recommendations"], status: "✓"),
         UnitItem(name: "HealthAPIService", description: "OpenAI GPT-4o clinical insight API", values: ["4 endpoints + mock fallback"], status: "✓"),
         UnitItem(name: "NetworkMiddleware", description: "Feature gating + request routing + sync orchestration", values: ["6 API endpoints"], status: "✓"),
         UnitItem(name: "SupabasePrimaryService", description: "Primary database CRUD + sync", values: ["REST + in-memory fallback + retry queue"], status: "✓"),
         UnitItem(name: "CloudflareBackupService", description: "Worker-based backup", values: ["batch upload + fetch + in-memory fallback"], status: "✓"),
         UnitItem(name: "DataSyncEngine", description: "E2E sync pipeline orchestrator", values: ["Supabase -> CloudKit -> Cloudflare"], status: "✓"),
-        UnitItem(name: "ApplePaySubscriptionService", description: "StoreKit IAP purchase/restore", values: ["6 products, mock mode for tests"], status: "✓"),
         UnitItem(name: "ReportService", description: "4 report types + PDF rendering", values: ["Clinical, Family, Handover, ACP + PDF"], status: "✓"),
-        UnitItem(name: "CloudKitManager", description: "Custom zone management + CRUD", values: ["6 zones, conflict resolution, subscriptions"], status: "✓"),
+        UnitItem(name: "CloudKitManager", description: "Custom zone management + CRUD", values: ["6 zones, conflict resolution, push notifications"], status: "✓"),
     ]),
 
     // MARK: - Data Layer

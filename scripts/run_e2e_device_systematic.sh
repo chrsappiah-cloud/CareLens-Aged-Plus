@@ -101,13 +101,12 @@ xcodebuild build-for-testing \
 FAILED=0
 
 run_phase "1. Enum units" \
-  "$TARGET/E2ESubscriptionTierTests" \
+  "$TARGET/E2EAccessTierTests" \
   "$TARGET/E2EAppFeatureTests" \
   "$TARGET/E2EUserRoleTests" \
   "$TARGET/E2EAssessmentStatusTests" \
   "$TARGET/E2EMonitoringEventTypeTests" \
   "$TARGET/E2ENeuroWatchBandTests" \
-  "$TARGET/E2ESubscriptionProductTests" \
   "$TARGET/E2EReportTypeTests" \
   "$TARGET/E2ECKZoneNameTests" \
   "$TARGET/E2ESyncModelTests" \
@@ -123,7 +122,7 @@ run_phase "2. Model units" \
 
 run_phase "3. Service units" \
   "$TARGET/AuthenticationServiceTests" \
-  "$TARGET/E2ESubscriptionMgrTests" \
+  "$TARGET/E2EAccessMgrTests" \
   "$TARGET/E2ENeuroWatchEngineTests" \
   "$TARGET/E2EHealthAPIServiceTests" \
   "$TARGET/E2ENetworkMiddlewareTests" \
@@ -133,7 +132,6 @@ run_phase "4. Sync units" \
   "$TARGET/E2ESupabasePrimaryServiceTests" \
   "$TARGET/E2ECloudflareBackupServiceTests" \
   "$TARGET/E2EDataSyncEngineTests" \
-  "$TARGET/E2EApplePaySubscriptionTests" \
   || FAILED=1
 
 run_phase "5. Report & data layer" \
@@ -145,6 +143,16 @@ run_phase "5. Report & data layer" \
 
 run_phase "6. WCS foundations" \
   "$TARGET/FoundationsTests" \
+  "$TARGET/AppLaunchTests" \
+  "$TARGET/AssertionTests" \
+  "$TARGET/LifecycleTests" \
+  "$TARGET/CoverageTests" \
+  "$TARGET/StartupControllerTests" \
+  "$TARGET/StorageTests" \
+  "$TARGET/NetworkRequestTests" \
+  "$TARGET/NetworkResponseTests" \
+  "$TARGET/TextFieldTests" \
+  "$TARGET/RefactoringSafetyTests" \
   || FAILED=1
 
 echo ""

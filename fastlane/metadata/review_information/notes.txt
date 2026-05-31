@@ -1,4 +1,4 @@
-CareLens Aged+ is clinical decision-support for aged care professionals.
+CareLens Aged+ is clinical decision-support for aged care professionals on iPhone and iPad.
 
 Sign in with the demo administrator account provided. On the login screen, tap "Admin: admin@carelens.health" to autofill credentials, then tap Sign In.
 
@@ -8,11 +8,17 @@ After login you can explore:
 • Intake — 7-step biopsychosocial workflow
 • Assess — NeuroWatch and assessment modules
 • Care Plan / Reports — sample care documentation
-• Settings — Privacy Policy, Terms, subscription management
+• Settings — Privacy Policy, Terms, access management
 
-Subscriptions use StoreKit 2. In-app purchases are optional; the demo admin account has Enterprise access without purchase.
+Access tiers (Free, Starter, Professional, Enterprise) are assigned by organisation administrators. The demo admin account has Enterprise access.
 
-AI features generate decision-support text only — not diagnoses. A disclaimer is shown in assessment and insight screens.
+AI features generate decision-support text only — not diagnoses. A disclaimer is shown in assessment and insight screens. No third-party generative AI brand names appear in the app or App Store metadata.
+
+CHINA AVAILABILITY: This app is not offered on the China mainland App Store. We have removed China from our storefront availability.
+
+CRASH FIX (build 4+): Resolved a SwiftData startup issue that could crash the app on launch on iPad. Verified on iPad Air 11-inch (M3) simulator and physical iPhone.
+
+IN-APP PURCHASE REMOVAL (build 5): All StoreKit subscription UI and in-app purchase references have been removed. Access tiers are assigned by organisation administrators only. No IAP products are attached to this submission.
 
 No special hardware required. CloudKit sync uses the reviewer's Apple ID sandbox environment.
 

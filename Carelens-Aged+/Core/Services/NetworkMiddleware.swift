@@ -41,9 +41,9 @@ class NetworkMiddleware: ObservableObject {
     func requestInsight(
         for endpoint: APIEndpoint,
         requiredFeature: AppFeature,
-        userTier: SubscriptionTier
+        userTier: AccessTier
     ) async throws -> ClinicalInsight? {
-        guard SubscriptionManager.shared.canAccess(feature: requiredFeature, tier: userTier) else {
+        guard AccessManager.shared.canAccess(feature: requiredFeature, tier: userTier) else {
             throw MiddlewareError.featureNotAvailable
         }
 
@@ -75,9 +75,9 @@ class NetworkMiddleware: ObservableObject {
         type: String,
         clientName: String,
         data: [String: String],
-        userTier: SubscriptionTier
+        userTier: AccessTier
     ) async throws -> String {
-        guard SubscriptionManager.shared.canAccess(feature: .advancedReports, tier: userTier) else {
+        guard AccessManager.shared.canAccess(feature: .advancedReports, tier: userTier) else {
             throw MiddlewareError.featureNotAvailable
         }
 
@@ -96,17 +96,17 @@ class NetworkMiddleware: ObservableObject {
         clients: [ClientProfile],
         assessments: [AssessmentSession],
         plans: [CarePlan],
-        userTier: SubscriptionTier
+        userTier: AccessTier
     ) async throws {
-        guard SubscriptionManager.shared.canAccess(feature: .supabasePrimary, tier: userTier) else {
+        guard AccessManager.shared.canAccess(feature: .supabasePrimary, tier: userTier) else {
             throw MiddlewareError.featureNotAvailable
         }
 
         pendingRequests += 1
         defer { pendingRequests -= 1 }
 
-        let enableCloudKit = SubscriptionManager.shared.canAccess(feature: .cloudSync, tier: userTier)
-        let enableCloudflare = SubscriptionManager.shared.canAccess(feature: .cloudflareBackup, tier: userTier)
+        let enableCloudKit = AccessManager.shared.canAccess(feature: .cloudSync, tier: userTier)
+        let enableCloudflare = AccessManager.shared.canAccess(feature: .cloudflareBackup, tier: userTier)
 
         let result = await syncEngine.performEndToEndSync(
             clients: clients,
@@ -131,7 +131,7 @@ class NetworkMiddleware: ObservableObject {
 
         var errorDescription: String? {
             switch self {
-            case .featureNotAvailable: return "This feature requires a higher subscription tier."
+            case .featureNotAvailable: return "This feature requires a higher access tier."
             case .networkUnavailable: return "No network connection. Data saved locally."
             case .serverError(let msg): return "Server error: \(msg)"
             }

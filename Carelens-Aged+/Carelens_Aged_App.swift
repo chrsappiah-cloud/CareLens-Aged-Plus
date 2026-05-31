@@ -10,16 +10,34 @@ enum ModelContainerFactory {
             CarePlan.self,
             MonitoringEvent.self
         ])
-        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
 
-        do {
-            let container = try ModelContainer(for: schema, configurations: config)
-            print("[CarelensAged] ModelContainer created successfully")
-            return container
-        } catch {
-            print("[CarelensAged] ModelContainer failed: \(error)")
-            preconditionFailure("SwiftData ModelContainer could not start: \(error)")
+        let inMemory = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let onDisk = ModelConfiguration(
+            "CareLensLocalStore",
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .none
+        )
+
+        if AppEnvironment.isRunningTests {
+            if let container = try? ModelContainer(for: schema, configurations: inMemory) {
+                print("[CarelensAged] ModelContainer created (in-memory test)")
+                return container
+            }
+            fatalError("SwiftData ModelContainer could not start for tests")
         }
+
+        if let container = try? ModelContainer(for: schema, configurations: onDisk) {
+            print("[CarelensAged] ModelContainer created (on-disk)")
+            return container
+        }
+
+        if let container = try? ModelContainer(for: schema, configurations: inMemory) {
+            print("[CarelensAged] ModelContainer created (in-memory fallback)")
+            return container
+        }
+
+        fatalError("SwiftData ModelContainer could not start with on-disk or in-memory configuration")
     }
 }
 

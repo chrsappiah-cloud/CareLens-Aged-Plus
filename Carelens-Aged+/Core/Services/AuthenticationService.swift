@@ -27,7 +27,7 @@ struct AppUser: Codable, Identifiable {
     var email: String
     var displayName: String
     var role: UserRole
-    var subscriptionTier: SubscriptionTier
+    var accessTier: AccessTier
     var isActive: Bool
     var facilityID: String?
     var createdAt: Date
@@ -43,16 +43,16 @@ class AuthenticationService: ObservableObject {
 
     static let shared = AuthenticationService()
 
-    private let subscriptionAccess: any SubscriptionAccessProviding
+    private let accessControl: any AccessControlProviding
     private let loginDelayNanoseconds: UInt64
     private let adminCredentials: [(email: String, password: String)]
 
     init(
-        subscriptionAccess: (any SubscriptionAccessProviding)? = nil,
+        accessControl: (any AccessControlProviding)? = nil,
         loginDelayNanoseconds: UInt64 = 800_000_000,
         adminCredentials: [(email: String, password: String)] = [("admin@carelens.health", "CareLens2026!")]
     ) {
-        self.subscriptionAccess = subscriptionAccess ?? SubscriptionManager.shared
+        self.accessControl = accessControl ?? AccessManager.shared
         self.loginDelayNanoseconds = loginDelayNanoseconds
         self.adminCredentials = adminCredentials
 
@@ -62,7 +62,7 @@ class AuthenticationService: ObservableObject {
                 email: "admin@carelens.health",
                 displayName: "System Administrator",
                 role: .admin,
-                subscriptionTier: .enterprise,
+                accessTier: .enterprise,
                 isActive: true,
                 facilityID: "facility_001",
                 createdAt: .now,
@@ -87,7 +87,7 @@ class AuthenticationService: ObservableObject {
                 email: email,
                 displayName: "System Administrator",
                 role: .admin,
-                subscriptionTier: .enterprise,
+                accessTier: .enterprise,
                 isActive: true,
                 facilityID: "facility_001",
                 createdAt: .now,
@@ -104,7 +104,7 @@ class AuthenticationService: ObservableObject {
                 email: email,
                 displayName: extractName(from: email),
                 role: .clinician,
-                subscriptionTier: .professional,
+                accessTier: .professional,
                 isActive: true,
                 facilityID: "facility_001",
                 createdAt: .now,
@@ -131,7 +131,7 @@ class AuthenticationService: ObservableObject {
 
     func hasAccess(to feature: AppFeature) -> Bool {
         guard let user = currentUser else { return false }
-        return subscriptionAccess.canAccess(feature: feature, tier: user.subscriptionTier)
+        return accessControl.canAccess(feature: feature, tier: user.accessTier)
     }
 
     private func isValidUserCredentials(email: String, password: String) -> Bool {
@@ -146,10 +146,10 @@ class AuthenticationService: ObservableObject {
 
 extension AuthenticationService {
     static func makeForTesting(
-        subscriptionAccess: (any SubscriptionAccessProviding)? = nil
+        accessControl: (any AccessControlProviding)? = nil
     ) -> AuthenticationService {
         AuthenticationService(
-            subscriptionAccess: subscriptionAccess ?? SubscriptionManager(),
+            accessControl: accessControl,
             loginDelayNanoseconds: 0
         )
     }

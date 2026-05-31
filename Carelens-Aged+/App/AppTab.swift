@@ -46,7 +46,7 @@ enum AppTab: Int, CaseIterable, Identifiable {
         case .assessments: return "NeuroWatch, cognition, mood, and safety screens"
         case .carePlans: return "Goals, interventions, and review dates"
         case .reports: return "Export narratives for your care team"
-        case .settings: return "Account, sync, legal, and subscription"
+        case .settings: return "Account, sync, legal, and access"
         }
     }
 

@@ -57,15 +57,15 @@ final class FoundationsTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(result.totalScore, 24)
     }
 
-    func test_subscriptionManager_freeTier_blocksAIInsights() {
-        let manager = SubscriptionManager()
+    func test_accessManager_freeTier_blocksAIInsights() {
+        let manager = AccessManager()
 
         XCTAssertFalse(manager.canAccess(feature: .aiInsights, tier: .free))
         XCTAssertTrue(manager.canAccess(feature: .dashboard, tier: .free))
     }
 
-    func test_subscriptionManager_enterpriseTier_grantsAllFeatures() {
-        let manager = SubscriptionManager()
+    func test_accessManager_enterpriseTier_grantsAllFeatures() {
+        let manager = AccessManager()
 
         for feature in AppFeature.allCases {
             XCTAssertTrue(
@@ -100,10 +100,10 @@ final class FoundationsTests: XCTestCase {
         XCTAssertTrue(report.contains("Mood"))
     }
 
-    func test_authenticationService_hasAccess_usesInjectedSubscriptionBoundary() async {
-        let subscriptionAccess = MockSubscriptionAccess()
-        subscriptionAccess.allowedFeatures = [.dashboard]
-        let auth = AuthenticationService.makeForTesting(subscriptionAccess: subscriptionAccess)
+    func test_authenticationService_hasAccess_usesInjectedAccessBoundary() async {
+        let accessControl = MockAccessControl()
+        accessControl.allowedFeatures = [.dashboard]
+        let auth = AuthenticationService.makeForTesting(accessControl: accessControl)
         _ = await auth.login(email: "clinician@carelens.health", password: "password123")
 
         XCTAssertTrue(auth.hasAccess(to: .dashboard))
@@ -120,7 +120,7 @@ final class FoundationsTests: XCTestCase {
         XCTAssertTrue(succeeded)
         XCTAssertTrue(auth.isAuthenticated)
         XCTAssertEqual(auth.currentUser?.role, .admin)
-        XCTAssertEqual(auth.currentUser?.subscriptionTier, .enterprise)
+        XCTAssertEqual(auth.currentUser?.accessTier, .enterprise)
     }
 
     func test_login_withInvalidPassword_setsErrorAndKeepsLoggedOut() async {

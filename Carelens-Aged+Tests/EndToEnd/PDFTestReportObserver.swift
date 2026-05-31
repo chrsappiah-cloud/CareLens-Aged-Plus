@@ -96,13 +96,12 @@ final class UnitTestReportObserver: NSObject, XCTestObservation {
         drawText("", size: 4)
 
         let enumUnits: [(String, String, [String])] = [
-            ("SubscriptionTier", "Business pricing tiers", ["free", "starter", "professional", "enterprise"]),
+            ("AccessTier", "Organisation access tiers", ["free", "starter", "professional", "enterprise"]),
             ("AppFeature", "Feature flags (19 features)", ["dashboard", "clientProfiles", "neuroWatch", "aiInsights", "adminPanel", "cloudSync", "supabasePrimary", "cloudflareBackup", "..."]),
             ("UserRole", "User access roles", ["admin", "clinician", "facilityManager", "familyMember", "carer", "externalClinician"]),
             ("AssessmentStatus", "Assessment lifecycle", ["draft", "inProgress", "needsReview", "completed", "urgent"]),
             ("MonitoringEventType", "Event categories (10)", ["wandering", "fall", "agitation", "missedMedication", "sleepDisruption", "..."]),
             ("NeuroWatchBand", "Cognitive screening bands", ["noSignificantChange", "mildConcern", "progressiveConcern", "urgentDeliriumRuleOut"]),
-            ("SubscriptionProduct", "IAP products (6)", ["starterMonthly", "starterAnnual", "professionalMonthly", "professionalAnnual", "enterpriseMonthly", "enterpriseAnnual"]),
             ("ReportType", "Report templates", ["clinical", "family", "facilityHandover", "acpSpiritual"]),
             ("SyncRecordType", "Sync entity types", ["client", "assessment", "carePlan", "monitoringEvent"]),
             ("SyncDestination", "Backend targets", ["supabasePrimary", "cloudKit", "cloudflare"]),
@@ -110,7 +109,6 @@ final class UnitTestReportObserver: NSObject, XCTestObservation {
             ("CKZoneName", "CloudKit zones (6)", ["ClientZone", "AssessmentZone", "CarePlanZone", "ReportZone", "CareCircleZone", "AuditZone"]),
             ("CKRecordType", "CloudKit record types (11)", ["CKClient", "CKAssessment", "CKCarePlan", "CKGoal", "..."]),
             ("APIEndpoint", "Network API routes", ["assessmentInsight", "differentialAnalysis", "carePlanSuggestions", "reportNarrative", "syncStatus", "backupStatus"]),
-            ("TransactionStatus", "Purchase states", ["idle", "processing", "success", "failed", "restored", "pending"]),
             ("MiddlewareError", "Network error types", ["featureNotAvailable", "networkUnavailable", "serverError"]),
         ]
 
@@ -147,15 +145,14 @@ final class UnitTestReportObserver: NSObject, XCTestObservation {
         drawText("", size: 4)
 
         let serviceUnits: [(String, String)] = [
-            ("AuthenticationService", "Login/logout, role-based access, subscription gating"),
-            ("SubscriptionManager", "Feature access control, user management, tier upgrades"),
+            ("AuthenticationService", "Login/logout, role-based access, tier gating"),
+            ("AccessManager", "Feature access control, user management, tier assignment"),
             ("NeuroWatchEngine", "Cognitive screening evaluation (4 bands, score 0-36+)"),
             ("HealthAPIService", "OpenAI GPT-4o clinical insight, differential, care plan, narrative"),
             ("NetworkMiddleware", "Feature gating, request routing, sync orchestration"),
             ("SupabasePrimaryService", "Primary DB: CRUD, full sync, retry queue, in-memory fallback"),
             ("CloudflareBackupService", "Secondary backup: batch upload, fetch, in-memory fallback"),
             ("DataSyncEngine", "E2E pipeline: Supabase -> CloudKit -> Cloudflare"),
-            ("ApplePaySubscriptionService", "StoreKit purchase, restore, cancel, mock mode"),
             ("ReportService", "4 report types + PDF rendering with Core Text"),
             ("CloudKitManager", "Custom zones, CRUD, change tracking, conflict resolution"),
         ]

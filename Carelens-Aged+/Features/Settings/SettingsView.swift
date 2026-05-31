@@ -44,9 +44,9 @@ struct SettingsView: View {
                                     .foregroundStyle(CareLensTheme.Colors.accentMint)
                                 Text("·")
                                     .foregroundStyle(CareLensTheme.Colors.textSecondary)
-                                Text(currentUser?.subscriptionTier.rawValue ?? "")
+                                Text(currentUser?.accessTier.rawValue ?? "")
                                     .font(.caption2)
-                                    .foregroundStyle(currentUser?.subscriptionTier.color ?? .gray)
+                                    .foregroundStyle(currentUser?.accessTier.color ?? .gray)
                             }
                         }
                     }
@@ -56,14 +56,7 @@ struct SettingsView: View {
                         UserAccessPanelView()
                             .environmentObject(authService)
                     } label: {
-                        Label("My Subscription & Access", systemImage: "crown")
-                    }
-
-                    NavigationLink {
-                        SubscriptionStoreView()
-                            .environmentObject(authService)
-                    } label: {
-                        Label("Upgrade Plan (Apple Pay)", systemImage: "apple.logo")
+                        Label("My Access & Features", systemImage: "crown")
                     }
                 } header: {
                     Label("Account", systemImage: "person.circle")
@@ -271,7 +264,7 @@ struct BackupSettingsView: View {
     private func runSync() async {
         isSyncing = true
         syncMessage = nil
-        let tier = authService.currentUser?.subscriptionTier ?? .free
+        let tier = authService.currentUser?.accessTier ?? .free
         do {
             try await middleware.syncData(
                 clients: clients,

@@ -5,19 +5,18 @@ import SwiftUI
 
 // MARK: - Display + Validate ALL Enum Units
 
-final class E2ESubscriptionTierTests: XCTestCase {
-    func testAllTiersHavePricing() {
-        for tier in SubscriptionTier.allCases {
-            XCTAssertGreaterThanOrEqual(tier.monthlyPrice, 0, "\(tier.rawValue) must have price")
+final class E2EAccessTierTests: XCTestCase {
+    func testAllTiersHaveLimits() {
+        for tier in AccessTier.allCases {
             XCTAssertGreaterThanOrEqual(tier.maxClients, 1, "\(tier.rawValue) must allow clients")
             XCTAssertFalse(tier.features.isEmpty, "\(tier.rawValue) must have features")
         }
     }
     func testTierHierarchy() {
-        let f = SubscriptionTier.free.maxClients
-        XCTAssertLessThan(f, SubscriptionTier.starter.maxClients)
-        XCTAssertLessThan(SubscriptionTier.starter.maxClients, SubscriptionTier.professional.maxClients)
-        XCTAssertEqual(SubscriptionTier.enterprise.maxClients, Int.max)
+        let f = AccessTier.free.maxClients
+        XCTAssertLessThan(f, AccessTier.starter.maxClients)
+        XCTAssertLessThan(AccessTier.starter.maxClients, AccessTier.professional.maxClients)
+        XCTAssertEqual(AccessTier.enterprise.maxClients, Int.max)
     }
 }
 
@@ -29,16 +28,16 @@ final class E2EAppFeatureTests: XCTestCase {
         }
     }
     func testFeatureCounts() {
-        XCTAssertEqual(SubscriptionTier.free.features.count, 3)
-        XCTAssertEqual(SubscriptionTier.starter.features.count, 8)
-        XCTAssertEqual(SubscriptionTier.professional.features.count, 15)
-        XCTAssertEqual(SubscriptionTier.enterprise.features.count, AppFeature.allCases.count)
+        XCTAssertEqual(AccessTier.free.features.count, 3)
+        XCTAssertEqual(AccessTier.starter.features.count, 8)
+        XCTAssertEqual(AccessTier.professional.features.count, 15)
+        XCTAssertEqual(AccessTier.enterprise.features.count, AppFeature.allCases.count)
     }
     func testTierSubset() {
-        let free = Set(SubscriptionTier.free.features)
-        let starter = Set(SubscriptionTier.starter.features)
-        let pro = Set(SubscriptionTier.professional.features)
-        let ent = Set(SubscriptionTier.enterprise.features)
+        let free = Set(AccessTier.free.features)
+        let starter = Set(AccessTier.starter.features)
+        let pro = Set(AccessTier.professional.features)
+        let ent = Set(AccessTier.enterprise.features)
         XCTAssertTrue(free.isSubset(of: starter))
         XCTAssertTrue(starter.isSubset(of: pro))
         XCTAssertTrue(pro.isSubset(of: ent))
@@ -84,27 +83,6 @@ final class E2ENeuroWatchBandTests: XCTestCase {
             XCTAssertFalse(b.color.isEmpty)
             XCTAssertFalse(b.suggestedAction.isEmpty)
         }
-    }
-}
-
-final class E2ESubscriptionProductTests: XCTestCase {
-    func testAllProducts() {
-        for p in SubscriptionProduct.allCases {
-            XCTAssertFalse(p.displayName.isEmpty)
-            XCTAssertFalse(p.price.isEmpty)
-        }
-    }
-    func testTierMapping() {
-        XCTAssertEqual(SubscriptionProduct.starterMonthly.tier, .starter)
-        XCTAssertEqual(SubscriptionProduct.starterAnnual.tier, .starter)
-        XCTAssertEqual(SubscriptionProduct.professionalMonthly.tier, .professional)
-        XCTAssertEqual(SubscriptionProduct.professionalAnnual.tier, .professional)
-        XCTAssertEqual(SubscriptionProduct.enterpriseMonthly.tier, .enterprise)
-        XCTAssertEqual(SubscriptionProduct.enterpriseAnnual.tier, .enterprise)
-    }
-    func testSavings() {
-        XCTAssertNotNil(SubscriptionProduct.starterAnnual.savings)
-        XCTAssertNil(SubscriptionProduct.starterMonthly.savings)
     }
 }
 

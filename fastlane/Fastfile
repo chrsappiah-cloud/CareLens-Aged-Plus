@@ -52,9 +52,36 @@ platform :ios do
   desc "Generate App Store screenshots (iPhone + iPad)"
   lane :screenshots do
     sh("../scripts/generate_screenshots.sh")
-    sh("cp -R ../AppStoreAssets/screenshots/iphone_6.9/. ./screenshots/en-US/")
-    sh("mkdir -p ./screenshots/en-US/iPad\\ Pro\\ \\(12.9-inch\\)\\ \\(6th\\ generation\\)/")
-    sh("cp -R ../AppStoreAssets/screenshots/ipad_13/. ./screenshots/en-US/iPad\\ Pro\\ \\(12.9-inch\\)\\ \\(6th\\ generation\\)/")
+    prepare_screenshot_folders
+  end
+
+  desc "Copy generated screenshots into deliver folders (iphone65 + ipadPro129)"
+  lane :prepare_screenshot_folders do
+    iphone_src = "../AppStoreAssets/screenshots/iphone_6.9"
+    ipad_src = "../AppStoreAssets/screenshots/ipad_12.9"
+    iphone_dest = "./screenshots/en-US"
+    ipad_dest = "./screenshots/en-US/iPad Pro (12.9-inch) (3rd generation)"
+
+    sh("mkdir -p '#{iphone_dest}' '#{ipad_dest}'")
+    sh("rm -f '#{iphone_dest}'/*.png '#{ipad_dest}'/*.png")
+
+    sh(<<~SCRIPT)
+      for src in "#{iphone_src}"/*.png; do
+        [ -f "$src" ] || continue
+        base=$(basename "$src" .png)
+        sips -z 2778 1284 "$src" --out "#{iphone_dest}/${base}_iphone65.png" >/dev/null
+      done
+    SCRIPT
+
+    sh("cp #{ipad_src}/*.png '#{ipad_dest}/' 2>/dev/null || true")
+    sh(<<~SCRIPT)
+      for f in "#{ipad_dest}"/*.png; do
+        [ -f "$f" ] || continue
+        case "$f" in *ipadPro129*) continue ;; esac
+        base=$(basename "$f" .png)
+        mv "$f" "#{ipad_dest}/${base}_ipadPro129.png"
+      done
+    SCRIPT
   end
 
   desc "Increment build number from latest TestFlight build"
@@ -77,6 +104,9 @@ platform :ios do
 
   desc "Build Release IPA"
   lane :build_release do
+    # Xcode export uses rsync flags that break with Homebrew/MacPorts rsync on PATH.
+    ENV["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Xcode.app/Contents/Developer/usr/bin:#{ENV['PATH']}"
+
     bump_build if ENV.fetch("BUMP_BUILD", "true") == "true"
 
     build_app(
@@ -107,13 +137,96 @@ platform :ios do
     )
   end
 
+  desc "Upload App Privacy nutrition labels to App Store Connect"
+  lane :privacy do
+    upload_app_privacy_details_to_app_store(
+      app_identifier: APP_IDENTIFIER,
+      team_id: ENV.fetch("APP_STORE_CONNECT_TEAM_ID", "TM2WG7HH96"),
+      json_path: "./fastlane/app_privacy_details.json"
+    )
+  end
+
+  desc "Remove China mainland from App Store availability"
+  lane :exclude_china do
+    sh("ruby ../scripts/exclude_china_availability.rb")
+  rescue StandardError => e
+    UI.important("Could not update China availability via API: #{e.message}")
+    UI.important("Remove China (CHN) manually in App Store Connect → Pricing and Availability before review.")
+  end
+
+  desc "Upload build 4 IPA, metadata, and submit for App Review (skip screenshot re-upload)"
+  lane :submit_review do
+    exclude_china
+
+    upload_to_app_store(
+      api_key: asc_api_key,
+      app_identifier: APP_IDENTIFIER,
+      ipa: File.expand_path("build/CarelensAged.ipa", __dir__),
+      app_version: get_version_number(xcodeproj: XCODEPROJ),
+      primary_category: "MEDICAL",
+      app_rating_config_path: "./fastlane/metadata/age_rating.json",
+      skip_metadata: false,
+      skip_screenshots: true,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_encryption_updated: false,
+        content_rights_has_rights: true,
+        content_rights_contains_third_party_content: false
+      }
+    )
+  end
+
+  desc "Build, upload screenshots/metadata, exclude China, and submit for App Review"
+  lane :resubmit_review do
+    if ENV.fetch("SKIP_SCREENSHOT_REGEN", "false") == "true"
+      prepare_screenshot_folders
+    else
+      screenshots
+    end
+    exclude_china
+    build_release unless ENV.fetch("SKIP_BUILD", "false") == "true"
+
+    upload_to_app_store(
+      api_key: asc_api_key,
+      app_identifier: APP_IDENTIFIER,
+      ipa: File.expand_path("build/CarelensAged.ipa", __dir__),
+      app_version: get_version_number(xcodeproj: XCODEPROJ),
+      primary_category: "MEDICAL",
+      app_rating_config_path: "./fastlane/metadata/age_rating.json",
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_encryption_updated: false,
+        content_rights_has_rights: true,
+        content_rights_contains_third_party_content: false
+      }
+    )
+  end
+
   desc "Upload metadata + screenshots and submit for App Review"
   lane :release do
+    prepare_screenshot_folders if Dir["./screenshots/en-US/*.png"].empty?
+
+    privacy rescue UI.important("Privacy labels upload skipped or already set")
+
     deliver(
       api_key: asc_api_key,
       app_identifier: APP_IDENTIFIER,
       app_version: get_version_number(xcodeproj: XCODEPROJ),
       build_number: get_build_number(xcodeproj: XCODEPROJ),
+      primary_category: "MEDICAL",
+      app_rating_config_path: "./fastlane/metadata/age_rating.json",
       skip_binary_upload: true,
       skip_metadata: false,
       skip_screenshots: false,
@@ -140,17 +253,19 @@ platform :ios do
       skip_binary_upload: true,
       skip_screenshots: false,
       submit_for_review: false,
-      force: true
+      force: true,
+      precheck_include_in_app_purchases: false
     )
   end
 end
 
 def default_changelog
   <<~NOTES
-    CareLens Aged+ 1.0
-    • AI-assisted clinical decision support for aged care teams
-    • NeuroWatch cognitive monitoring and biopsychosocial assessments
-    • Care plans, reports, and CloudKit sync
-    • Subscription tiers via Apple In-App Purchase
+    CareLens Aged+ 1.0 (build 5)
+    • Removed all in-app purchase and StoreKit subscription UI
+    • Access tiers assigned by organisation administrators only
+    • WCS testing kit suites and physical-device E2E verification
+    • Fixed iPad launch crash (SwiftData ModelContainer)
+    • Excluded China mainland App Store availability
   NOTES
 end

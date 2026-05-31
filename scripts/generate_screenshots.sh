@@ -6,11 +6,11 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 IPHONE_DEVICE="${IPHONE_DEVICE:-iPhone 17 Pro Max}"
-IPAD_DEVICE="${IPAD_DEVICE:-Scholars Gallery iPad 13}"
+IPAD_DEVICE="${IPAD_DEVICE:-iPad Air 11-inch (M3)}"
 IOS_VERSION="${IOS_VERSION:-26.5}"
 
 OUT_IPHONE="$ROOT/AppStoreAssets/screenshots/iphone_6.9"
-OUT_IPAD="$ROOT/AppStoreAssets/screenshots/ipad_13"
+OUT_IPAD="$ROOT/AppStoreAssets/screenshots/ipad_12.9"
 mkdir -p "$OUT_IPHONE" "$OUT_IPAD"
 
 run_screenshots() {

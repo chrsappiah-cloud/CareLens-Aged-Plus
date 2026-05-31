@@ -12,7 +12,7 @@ final class AuthenticationServiceTests: XCTestCase {
         XCTAssertTrue(r)
         XCTAssertTrue(auth.isAuthenticated)
         XCTAssertEqual(auth.currentUser?.role, .admin)
-        XCTAssertEqual(auth.currentUser?.subscriptionTier, .enterprise)
+        XCTAssertEqual(auth.currentUser?.accessTier, .enterprise)
     }
     @MainActor
     func testClinicianLogin() async {
@@ -20,7 +20,7 @@ final class AuthenticationServiceTests: XCTestCase {
         let r = await auth.login(email: "clinician@carelens.health", password: "password123")
         XCTAssertTrue(r)
         XCTAssertEqual(auth.currentUser?.role, .clinician)
-        XCTAssertEqual(auth.currentUser?.subscriptionTier, .professional)
+        XCTAssertEqual(auth.currentUser?.accessTier, .professional)
     }
     @MainActor
     func testInvalidLogin() async {
@@ -60,10 +60,10 @@ final class AuthenticationServiceTests: XCTestCase {
     }
 }
 
-final class E2ESubscriptionMgrTests: XCTestCase {
+final class E2EAccessMgrTests: XCTestCase {
     @MainActor
     func testFeatureAccess() {
-        let m = SubscriptionManager()
+        let m = AccessManager()
         XCTAssertTrue(m.canAccess(feature: .dashboard, tier: .free))
         XCTAssertFalse(m.canAccess(feature: .aiInsights, tier: .free))
         XCTAssertTrue(m.canAccess(feature: .neuroWatch, tier: .starter))
@@ -72,12 +72,12 @@ final class E2ESubscriptionMgrTests: XCTestCase {
     }
     @MainActor
     func testUserManagement() {
-        let m = SubscriptionManager()
-        let u = AppUser(id: "nu", email: "n@t.com", displayName: "N", role: .clinician, subscriptionTier: .starter, isActive: true, facilityID: nil, createdAt: .now, lastLoginAt: nil)
+        let m = AccessManager()
+        let u = AppUser(id: "nu", email: "n@t.com", displayName: "N", role: .clinician, accessTier: .starter, isActive: true, facilityID: nil, createdAt: .now, lastLoginAt: nil)
         m.addUser(u)
         XCTAssertTrue(m.managedUsers.contains(where: { $0.id == "nu" }))
-        m.upgradeUser("nu", to: .professional)
-        XCTAssertEqual(m.managedUsers.first(where: { $0.id == "nu" })?.subscriptionTier, .professional)
+        m.setAccessTier(for: "nu", to: .professional)
+        XCTAssertEqual(m.managedUsers.first(where: { $0.id == "nu" })?.accessTier, .professional)
         m.removeUser("nu")
         XCTAssertFalse(m.managedUsers.contains(where: { $0.id == "nu" }))
     }

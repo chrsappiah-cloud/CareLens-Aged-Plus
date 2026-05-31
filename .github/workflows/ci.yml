@@ -61,6 +61,9 @@ jobs:
       - name: Verify E2E test plan includes foundations
         run: grep -q "FoundationsTests" E2ETests.xctestplan
 
+      - name: Verify WCS testing kit
+        run: bash scripts/wcs_test_readiness_check.sh
+
       - name: Run unit tests (required)
         run: |
           set -o pipefail
@@ -69,6 +72,7 @@ jobs:
             -scheme "Carelens-Aged+" \
             -destination "${SIM_TEST_DESTINATION:-$SIM_DESTINATION}" \
             -only-testing:"Carelens-Aged+Tests" \
+            -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
             IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \

@@ -77,25 +77,3 @@ final class E2EDataSyncEngineTests: XCTestCase {
         XCTAssertEqual(r.primary.recordsWritten, 2)
     }
 }
-
-final class E2EApplePaySubscriptionTests: XCTestCase {
-    @MainActor
-    func testPurchase() async {
-        let s = ApplePaySubscriptionService()
-        await s.purchase(.professionalMonthly)
-        XCTAssertEqual(s.purchasedSubscription, .professionalMonthly)
-        XCTAssertEqual(s.transactionStatus, .success)
-    }
-    @MainActor
-    func testRestore() async {
-        let s = ApplePaySubscriptionService()
-        await s.restorePurchases()
-        XCTAssertEqual(s.transactionStatus, .restored)
-    }
-    @MainActor
-    func testCancel() async {
-        let s = ApplePaySubscriptionService()
-        await s.cancelSubscription()
-        XCTAssertNil(s.purchasedSubscription)
-    }
-}

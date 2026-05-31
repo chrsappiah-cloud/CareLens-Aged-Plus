@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AdminPanelView: View {
     @EnvironmentObject var authService: AuthenticationService
-    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @StateObject private var accessManager = AccessManager.shared
     @State private var showingAddUser = false
     @State private var selectedTab = 0
 
@@ -13,7 +13,7 @@ struct AdminPanelView: View {
                 ScrollView {
                     switch selectedTab {
                     case 0: userManagementSection
-                    case 1: subscriptionOverview
+                    case 1: accessPlanOverview
                     case 2: systemHealthSection
                     default: userManagementSection
                     }
@@ -38,8 +38,8 @@ struct AdminPanelView: View {
 
     private var adminSegmentPicker: some View {
         HStack(spacing: 8) {
-            ForEach(["Users", "Subscriptions", "System"], id: \.self) { tab in
-                let index = ["Users", "Subscriptions", "System"].firstIndex(of: tab) ?? 0
+            ForEach(["Users", "Access Plans", "System"], id: \.self) { tab in
+                let index = ["Users", "Access Plans", "System"].firstIndex(of: tab) ?? 0
                 Button(action: { withAnimation { selectedTab = index } }) {
                     Text(tab)
                         .font(.caption.bold())
@@ -65,20 +65,20 @@ struct AdminPanelView: View {
 
     private var userManagementSection: some View {
         VStack(spacing: 12) {
-            ForEach(subscriptionManager.managedUsers) { user in
+            ForEach(accessManager.managedUsers) { user in
                 AdminUserCard(user: user)
             }
         }
         .padding()
     }
 
-    private var subscriptionOverview: some View {
+    private var accessPlanOverview: some View {
         VStack(spacing: 16) {
-            ForEach(SubscriptionTier.allCases, id: \.self) { tier in
-                let count = subscriptionManager.managedUsers.filter { $0.subscriptionTier == tier }.count
+            ForEach(AccessTier.allCases, id: \.self) { tier in
+                let count = accessManager.managedUsers.filter { $0.accessTier == tier }.count
                 DiamondGlassCard(
                     title: tier.rawValue,
-                    subtitle: "$\(String(format: "%.2f", tier.monthlyPrice))/mo · \(count) user(s)",
+                    subtitle: "\(count) user(s) · \(tier.features.count) features",
                     icon: "crown"
                 ) {
                     VStack(alignment: .leading, spacing: 6) {
@@ -101,11 +101,11 @@ struct AdminPanelView: View {
 
     private var systemHealthSection: some View {
         VStack(spacing: 16) {
-            DiamondGlassCard(title: "API Status", subtitle: "OpenAI Health API", icon: "network") {
+            DiamondGlassCard(title: "API Status", subtitle: "CareLens Clinical API", icon: "network") {
                 HStack {
                     DiamondStatusChip(text: "Connected", level: .safe)
                     Spacer()
-                    Text("gpt-4o")
+                    Text("Clinical AI")
                         .font(.caption)
                         .foregroundStyle(CareLensTheme.Colors.textSecondary)
                 }
@@ -133,7 +133,7 @@ struct AdminPanelView: View {
 
             DiamondGlassCard(title: "Active Sessions", subtitle: "Currently logged in", icon: "person.3.sequence") {
                 HStack {
-                    Text("\(subscriptionManager.managedUsers.filter { $0.isActive }.count) users online")
+                    Text("\(accessManager.managedUsers.filter { $0.isActive }.count) users online")
                         .font(.subheadline)
                         .foregroundStyle(CareLensTheme.Colors.textPrimary)
                     Spacer()
@@ -147,7 +147,7 @@ struct AdminPanelView: View {
 
 struct AdminUserCard: View {
     let user: AppUser
-    @StateObject private var manager = SubscriptionManager.shared
+    @StateObject private var manager = AccessManager.shared
     @State private var showingTierPicker = false
 
     var body: some View {
@@ -157,7 +157,7 @@ struct AdminUserCard: View {
             icon: user.isActive ? "person.fill.checkmark" : "person.fill.xmark"
         ) {
             HStack(spacing: 8) {
-                DiamondStatusChip(text: user.subscriptionTier.rawValue, color: user.subscriptionTier.color)
+                DiamondStatusChip(text: user.accessTier.rawValue, color: user.accessTier.color)
                 DiamondStatusChip(
                     text: user.isActive ? "Active" : "Disabled",
                     level: user.isActive ? .safe : .risk
@@ -166,8 +166,8 @@ struct AdminUserCard: View {
                 Menu {
                     Button("Toggle Active") { manager.toggleUserActive(user.id) }
                     Menu("Change Tier") {
-                        ForEach(SubscriptionTier.allCases, id: \.self) { tier in
-                            Button(tier.rawValue) { manager.upgradeUser(user.id, to: tier) }
+                        ForEach(AccessTier.allCases, id: \.self) { tier in
+                            Button(tier.rawValue) { manager.setAccessTier(for: user.id, to: tier) }
                         }
                     }
                     Button("Remove User", role: .destructive) { manager.removeUser(user.id) }
@@ -182,11 +182,11 @@ struct AdminUserCard: View {
 
 struct AddUserView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var manager = SubscriptionManager.shared
+    @StateObject private var manager = AccessManager.shared
     @State private var email = ""
     @State private var displayName = ""
     @State private var role: UserRole = .clinician
-    @State private var tier: SubscriptionTier = .starter
+    @State private var tier: AccessTier = .starter
 
     var body: some View {
         NavigationStack {
@@ -200,10 +200,10 @@ struct AddUserView: View {
                         ForEach(UserRole.allCases, id: \.self) { Text($0.rawValue) }
                     }
                 }
-                Section("Subscription") {
+                Section("Access Plan") {
                     Picker("Tier", selection: $tier) {
-                        ForEach(SubscriptionTier.allCases, id: \.self) {
-                            Text("\($0.rawValue) — $\(String(format: "%.2f", $0.monthlyPrice))/mo")
+                        ForEach(AccessTier.allCases, id: \.self) {
+                            Text($0.rawValue)
                         }
                     }
                 }
@@ -227,7 +227,7 @@ struct AddUserView: View {
             email: email,
             displayName: displayName,
             role: role,
-            subscriptionTier: tier,
+            accessTier: tier,
             isActive: true,
             facilityID: "facility_001",
             createdAt: .now,

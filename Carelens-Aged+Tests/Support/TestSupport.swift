@@ -2,10 +2,10 @@ import Foundation
 @testable import CarelensAged
 
 @MainActor
-final class MockSubscriptionAccess: SubscriptionAccessProviding {
+final class MockAccessControl: AccessControlProviding {
     var allowedFeatures: Set<AppFeature> = Set(AppFeature.allCases)
 
-    func canAccess(feature: AppFeature, tier: SubscriptionTier) -> Bool {
+    func canAccess(feature: AppFeature, tier: AccessTier) -> Bool {
         allowedFeatures.contains(feature)
     }
 }
@@ -24,14 +24,14 @@ enum TestFixtures {
         id: String = "test-user",
         email: String = "clinician@carelens.health",
         role: UserRole = .clinician,
-        tier: SubscriptionTier = .professional
+        tier: AccessTier = .professional
     ) -> AppUser {
         AppUser(
             id: id,
             email: email,
             displayName: "Test Clinician",
             role: role,
-            subscriptionTier: tier,
+            accessTier: tier,
             isActive: true,
             facilityID: "facility_001",
             createdAt: .now,

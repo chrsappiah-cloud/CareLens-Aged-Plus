@@ -3,8 +3,8 @@ import SwiftUI
 struct UserAccessPanelView: View {
     @EnvironmentObject var authService: AuthenticationService
 
-    private var currentTier: SubscriptionTier {
-        authService.currentUser?.subscriptionTier ?? .free
+    private var currentTier: AccessTier {
+        authService.currentUser?.accessTier ?? .free
     }
 
     var body: some View {
@@ -13,7 +13,6 @@ struct UserAccessPanelView: View {
                 VStack(spacing: CareLensTheme.sectionSpacing) {
                     currentPlanCard
                     featuresGrid
-                    upgradeSuggestion
                 }
                 .padding()
             }
@@ -26,19 +25,14 @@ struct UserAccessPanelView: View {
     private var currentPlanCard: some View {
         DiamondGlassCard(
             title: currentTier.rawValue,
-            subtitle: "Current subscription plan",
+            subtitle: "Current access plan",
             icon: "crown"
         ) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("$\(String(format: "%.2f", currentTier.monthlyPrice))/month")
-                        .font(.title3.bold())
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color(red: 0.35, green: 0.40, blue: 0.88), Color(red: 0.60, green: 0.35, blue: 0.80), Color(red: 0.72, green: 0.50, blue: 0.32)],
-                                startPoint: .leading, endPoint: .trailing
-                            )
-                        )
+                    Text("Organisation-assigned access")
+                        .font(.subheadline)
+                        .foregroundStyle(CareLensTheme.Colors.textSecondary)
                     Spacer()
                     DiamondStatusChip(text: "Active", level: .safe)
                 }
@@ -72,36 +66,6 @@ struct UserAccessPanelView: View {
         }
     }
 
-    private var upgradeSuggestion: some View {
-        Group {
-            if currentTier != .enterprise {
-                let nextTier = nextAvailableTier
-                DiamondGlassCard(
-                    title: "Upgrade to \(nextTier.rawValue)",
-                    subtitle: "Unlock \(nextTier.features.count - currentTier.features.count) more features",
-                    icon: "arrow.up.circle"
-                ) {
-                    Button(action: {}) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                            Text("Upgrade — $\(String(format: "%.2f", nextTier.monthlyPrice))/mo")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(DiamondButtonStyle())
-                }
-            }
-        }
-    }
-
-    private var nextAvailableTier: SubscriptionTier {
-        switch currentTier {
-        case .free: return .starter
-        case .starter: return .professional
-        case .professional: return .enterprise
-        case .enterprise: return .enterprise
-        }
-    }
 }
 
 struct FeatureAccessCard: View {

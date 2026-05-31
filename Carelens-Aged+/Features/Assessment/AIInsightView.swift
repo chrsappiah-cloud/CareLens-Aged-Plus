@@ -37,7 +37,7 @@ struct AIInsightView: View {
     private var headerCard: some View {
         DiamondGlassCard(
             title: "Clinical AI Analysis",
-            subtitle: "Powered by OpenAI GPT-4o Health API",
+            subtitle: "CareLens clinical decision-support analysis",
             icon: "brain"
         ) {
             HStack {
@@ -152,7 +152,7 @@ struct AIInsightView: View {
 
     private func generateInsight() async {
         guard authService.hasAccess(to: .aiInsights) else {
-            errorMessage = "AI Insights requires a Professional or Enterprise subscription."
+            errorMessage = "AI Insights requires Professional or Enterprise access."
             return
         }
 
@@ -168,7 +168,7 @@ struct AIInsightView: View {
                     concerns: client.presentingConcerns
                 ),
                 requiredFeature: .aiInsights,
-                userTier: authService.currentUser?.subscriptionTier ?? .free
+                userTier: authService.currentUser?.accessTier ?? .free
             )
         } catch {
             errorMessage = error.localizedDescription
