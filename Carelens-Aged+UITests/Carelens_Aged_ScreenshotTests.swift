@@ -4,52 +4,51 @@ import XCTest
 /// Run via: scripts/generate_screenshots.sh
 final class Carelens_Aged_ScreenshotTests: XCTestCase {
 
-    var app: XCUIApplication!
-
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-        app = XCUIApplication()
-        app.launchArguments.append("-UITesting")
-        app.launch()
+    private struct Screen {
+        let name: String
+        let tabIdentifier: String
+        let shellMarker: String
     }
+
+    private let screens: [Screen] = [
+        Screen(name: "01_Dashboard", tabIdentifier: "tab_dashboard", shellMarker: "Care Overview"),
+        Screen(name: "02_Clients", tabIdentifier: "tab_clients", shellMarker: "Client Caseload"),
+        Screen(name: "03_Intake", tabIdentifier: "tab_intake", shellMarker: "New Client Admission"),
+        Screen(name: "04_Assessments", tabIdentifier: "tab_assess", shellMarker: "Clinical Assessments"),
+        Screen(name: "05_CarePlan", tabIdentifier: "tab_careplan", shellMarker: "Care Plans"),
+        Screen(name: "06_Reports", tabIdentifier: "tab_reports", shellMarker: "Reports & Summaries"),
+        Screen(name: "07_Settings", tabIdentifier: "tab_settings", shellMarker: "Settings & Account")
+    ]
 
     @MainActor
     func testCaptureAppStoreScreenshots() throws {
-        XCTAssertTrue(waitForTab("tab_dashboard", fallbackLabel: "Home"), "Dashboard did not load")
-
-        capture("01_Dashboard", tab: "tab_dashboard", fallbackLabel: "Home")
-        capture("02_Clients", tab: "tab_clients", fallbackLabel: "Clients")
-        capture("03_Intake", tab: "tab_intake", fallbackLabel: "Admit")
-        capture("04_Assessments", tab: "tab_assess", fallbackLabel: "Assess")
-        capture("05_CarePlan", tab: "tab_careplan", fallbackLabel: "Plans")
-        capture("06_Reports", tab: "tab_reports", fallbackLabel: "Reports")
-        capture("07_Settings", tab: "tab_settings", fallbackLabel: "Settings")
-    }
-
-    // MARK: - Helpers
-
-    private func waitForTab(_ identifier: String, fallbackLabel: String, timeout: TimeInterval = 12) -> Bool {
-        let tab = app.tabBars.buttons[identifier]
-        if tab.waitForExistence(timeout: timeout) { return true }
-        return app.tabBars.buttons[fallbackLabel].waitForExistence(timeout: 4)
-    }
-
-    private func selectTab(_ identifier: String, fallbackLabel: String) {
-        let tab = app.tabBars.buttons[identifier]
-        if tab.exists {
-            tab.tap()
-        } else {
-            app.tabBars.buttons[fallbackLabel].tap()
+        for screen in screens {
+            let app = XCUIApplication()
+            app.launchArguments = ["-UITesting", "-ScreenshotTab=\(screen.tabIdentifier)"]
+            app.launch()
+            XCTAssertTrue(
+                waitForShell(app: app, marker: screen.shellMarker, timeout: 30),
+                "\(screen.name): expected '\(screen.shellMarker)'"
+            )
+            sleep(2)
+            let attachment = XCTAttachment(screenshot: app.screenshot())
+            attachment.name = screen.name
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            app.terminate()
         }
-        sleep(1)
     }
 
-    private func capture(_ name: String, tab identifier: String, fallbackLabel: String) {
-        selectTab(identifier, fallbackLabel: fallbackLabel)
-        let shot = app.screenshot()
-        let attachment = XCTAttachment(screenshot: shot)
-        attachment.name = name
-        attachment.lifetime = .keepAlways
-        add(attachment)
+    private func waitForShell(app: XCUIApplication, marker: String, timeout: TimeInterval) -> Bool {
+        let candidates = [
+            app.staticTexts[marker],
+            app.navigationBars[marker]
+        ]
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if candidates.contains(where: { $0.exists }) { return true }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
+        return false
     }
 }

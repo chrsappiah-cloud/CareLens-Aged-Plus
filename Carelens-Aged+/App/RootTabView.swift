@@ -51,8 +51,21 @@ struct RootTabView: View {
             .toolbarBackground(CareLensTheme.Colors.tabBarBackground, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarColorScheme(.dark, for: .tabBar)
+            .tabViewStyle(.tabBarOnly)
         }
         .preferredColorScheme(.dark)
+        .onAppear(perform: applyScreenshotTabIfNeeded)
+    }
+
+    /// `-ScreenshotTab=tab_dashboard` etc. — used by UI screenshot tests to land on a tab without tab-bar tapping.
+    private func applyScreenshotTabIfNeeded() {
+        guard let arg = ProcessInfo.processInfo.arguments.first(where: { $0.hasPrefix("-ScreenshotTab=") }) else {
+            return
+        }
+        let identifier = String(arg.dropFirst("-ScreenshotTab=".count))
+        if let tab = AppTab.allCases.first(where: { $0.accessibilityIdentifier == identifier }) {
+            selectedTab = tab
+        }
     }
 
     @ViewBuilder

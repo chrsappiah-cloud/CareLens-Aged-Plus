@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 IPHONE_DEVICE="${IPHONE_DEVICE:-iPhone 17 Pro Max}"
-IPAD_DEVICE="${IPAD_DEVICE:-iPad Air 11-inch (M3)}"
+IPAD_DEVICE="${IPAD_DEVICE:-iPad Air 11-inch M3 Review}"
 IOS_VERSION="${IOS_VERSION:-26.5}"
 
 OUT_IPHONE="$ROOT/AppStoreAssets/screenshots/iphone_6.9"
@@ -20,15 +20,20 @@ run_screenshots() {
 
   echo "==> Screenshots on: $device"
   rm -rf "$result_path"
+  rm -f "$out_dir"/[0-9][0-9]_*.png
 
-  xcodebuild test \
+  if ! xcodebuild test \
     -project "Carelens-Aged+.xcodeproj" \
     -scheme "Carelens-Aged+" \
     -destination "platform=iOS Simulator,name=${device},OS=${IOS_VERSION}" \
     -only-testing:"Carelens-Aged+UITests/Carelens_Aged_ScreenshotTests/testCaptureAppStoreScreenshots" \
     -resultBundlePath "$result_path" \
+    -parallel-testing-enabled NO \
+    -maximum-concurrent-test-simulator-destinations 1 \
     CODE_SIGNING_ALLOWED=NO \
-    | xcbeautify || true
+    | xcbeautify; then
+    echo "WARNING: xcodebuild reported failures for $device — attempting attachment export anyway"
+  fi
 
   ruby "$ROOT/scripts/extract_screenshots.rb" "$result_path" "$out_dir"
 }
@@ -36,17 +41,25 @@ run_screenshots() {
 boot_sim() {
   local name="$1"
   local udid
-  udid=$(xcrun simctl list devices available | grep "$name (" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+  udid=$(xcrun simctl list devices available | grep -F "$name (" | head -1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
   if [[ -n "$udid" ]]; then
+    xcrun simctl shutdown "$udid" 2>/dev/null || true
     xcrun simctl boot "$udid" 2>/dev/null || true
     xcrun simctl bootstatus "$udid" -b
   fi
 }
 
-boot_sim "$IPHONE_DEVICE"
-boot_sim "$IPAD_DEVICE"
+shutdown_all_sims() {
+  xcrun simctl shutdown all 2>/dev/null || true
+  sleep 2
+}
 
+shutdown_all_sims
+boot_sim "$IPHONE_DEVICE"
 run_screenshots "$IPHONE_DEVICE" "$OUT_IPHONE"
+
+shutdown_all_sims
+boot_sim "$IPAD_DEVICE"
 run_screenshots "$IPAD_DEVICE" "$OUT_IPAD"
 
 echo "Screenshots saved to:"

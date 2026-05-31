@@ -59,6 +59,7 @@ struct Carelens_Aged_App: App {
                     RootTabView()
                         .onAppear {
                             guard !AppEnvironment.isRunningTests else { return }
+                            guard !ProcessInfo.processInfo.arguments.contains("-UITesting") else { return }
                             if !hasLoadedMockData {
                                 let context = sharedModelContainer.mainContext
                                 MockData.populateSampleData(context: context)
