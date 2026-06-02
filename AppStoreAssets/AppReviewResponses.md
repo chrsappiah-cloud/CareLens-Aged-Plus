@@ -23,9 +23,9 @@ Tap the **Admin** demo credential button on the login screen, then **Sign In**. 
 
 Screenshots are captured from the production UI using UI tests on iPhone 17 Pro Max and iPad simulators. No mockups or misleading imagery.
 
-## Guideline 3.1.1 — In-App Purchase
+## Guideline 3.1.1 — Access
 
-This version does not offer in-app purchases. Access tiers are assigned by organisation administrators. Reviewers can use the demo admin account with Enterprise access — no purchase is required.
+This version does not include locked digital content or access flows. Access levels are assigned by organisation administrators. Reviewers can use the demo admin account with Enterprise access.
 
 ## Guideline 5.1.1 — Privacy / Health Data
 

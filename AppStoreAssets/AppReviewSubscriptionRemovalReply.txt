@@ -1,0 +1,28 @@
+Hello App Review,
+
+Thank you for reviewing Carelens-Aged+.
+
+We have uploaded a new binary for version 1.0, build 202606030930.
+
+This build removes all references to subscriptions, In-App Purchases, StoreKit purchase flows, paid plans, pricing, billing, paywalls, upgrade prompts, restore controls, payment screens, and premium messaging from the app codebase, UI, UX, frontend, App Review notes, Fastlane release notes, scripts, and generated report materials.
+
+Carelens-Aged+ now presents access only as administrator-managed role access for aged-care teams. There is no customer purchase path in the app, no subscription screen, no payment button, no paywall, no restore-purchases control, and no In-App Purchase product attached to this app version.
+
+Verification completed:
+
+- Searched the app source, UI, UX, frontend, release metadata, scripts, and generated report materials for subscription, In-App Purchase, StoreKit, payment, purchase, pricing, paywall, upgrade, trial, billing, and premium terminology. No matches remain outside this App Review response artifact.
+- Built the app successfully with Xcode using scheme Carelens-Aged+ and build number 202606030930.
+- Ran systematic end-to-end testing on a physical iPhone before submission: Christopher’s iPhone, iOS 26.6, device ID 00008150-001102643CD2401C. All phases passed, including unit/model/service/sync/report/foundations sweeps and UI smoke.
+- Confirmed the visible app UI and supporting release metadata describe only administrator-managed access.
+
+Reviewer path:
+
+1. Launch Carelens-Aged+.
+2. Use the demo admin credentials if sign-in is requested.
+3. Open Dashboard, Clients, Assessments, Monitoring, Reports, Admin, and Settings.
+4. Confirm there are no subscription, In-App Purchase, pricing, payment, upgrade, restore, or paywall controls.
+
+The app is submitted without In-App Purchase products because the new binary does not contain purchase functionality.
+
+Kind regards,
+Christopher Appiah-Thompson

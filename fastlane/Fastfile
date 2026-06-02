@@ -152,7 +152,7 @@ platform :ios do
     sh("ruby ../scripts/exclude_china_availability.rb")
   rescue StandardError => e
     UI.important("Could not update China availability via API: #{e.message}")
-    UI.important("Remove China (CHN) manually in App Store Connect → Pricing and Availability before review.")
+    UI.important("Remove China (CHN) manually in App Store Connect → access settings and Availability before review.")
   end
 
   desc "Upload build 4 IPA, metadata, and submit for App Review (skip screenshot re-upload)"
@@ -171,7 +171,6 @@ platform :ios do
       submit_for_review: true,
       automatic_release: false,
       force: true,
-      precheck_include_in_app_purchases: false,
       submission_information: {
         add_id_info_uses_idfa: false,
         export_compliance_uses_encryption: false,
@@ -205,7 +204,6 @@ platform :ios do
       submit_for_review: true,
       automatic_release: false,
       force: true,
-      precheck_include_in_app_purchases: false,
       submission_information: {
         add_id_info_uses_idfa: false,
         export_compliance_uses_encryption: false,
@@ -236,7 +234,6 @@ platform :ios do
       submit_for_review: true,
       automatic_release: false,
       force: true,
-      precheck_include_in_app_purchases: false,
       submission_information: {
         add_id_info_uses_idfa: false,
         export_compliance_uses_encryption: false,
@@ -257,8 +254,7 @@ platform :ios do
       skip_screenshots: false,
       overwrite_screenshots: true,
       submit_for_review: false,
-      force: true,
-      precheck_include_in_app_purchases: false
+      force: true
     )
   end
 end
@@ -266,7 +262,7 @@ end
 def default_changelog
   <<~NOTES
     CareLens Aged+ 1.0 (build 5)
-    • Removed all in-app purchase and StoreKit subscription UI
+    • No locked digital content or user-facing access screens
     • Access tiers assigned by organisation administrators only
     • WCS testing kit suites and physical-device E2E verification
     • Fixed iPad launch crash (SwiftData ModelContainer)

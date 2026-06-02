@@ -120,7 +120,6 @@ actor DataSyncEngine {
 
     func performInitialSync() async throws {
         try await cloudKit.createCustomZones()
-        try await cloudKit.setupPushSubscriptions()
     }
 
     func syncPendingCloudKitChanges() async throws {

@@ -33,11 +33,11 @@ struct UnitItem {
 
 let categories: [UnitCategory] = [
     // MARK: - Enums
-    UnitCategory(name: "AccessTier", description: "Organisation access & feature tiers", items: [
-        UnitItem(name: "free", description: "Free tier — 3 clients, 3 features", values: ["Price: $0/mo", "Max Clients: 3", "Features: dashboard, clientProfiles, basicAssessment"], status: "✓"),
-        UnitItem(name: "starter", description: "Starter tier — 15 clients, 8 features", values: ["Price: $29.99/mo", "Max Clients: 15"], status: "✓"),
-        UnitItem(name: "professional", description: "Professional tier — 100 clients, 15 features", values: ["Price: $79.99/mo", "Max Clients: 100"], status: "✓"),
-        UnitItem(name: "enterprise", description: "Enterprise tier — unlimited, all 19 features", values: ["Price: $199.99/mo", "Max Clients: ∞"], status: "✓"),
+    UnitCategory(name: "AccessTier", description: "Organisation access and feature groups", items: [
+        UnitItem(name: "basic", description: "Basic access — 3 clients, 3 features", values: ["Max Clients: 3", "Features: dashboard, clientProfiles, basicAssessment"], status: "✓"),
+        UnitItem(name: "starter", description: "Starter access — 15 clients, 8 features", values: ["Max Clients: 15"], status: "✓"),
+        UnitItem(name: "professional", description: "Professional access — 100 clients, 15 features", values: ["Max Clients: 100"], status: "✓"),
+        UnitItem(name: "enterprise", description: "Enterprise access — unlimited, all 19 features", values: ["Max Clients: ∞"], status: "✓"),
     ]),
     UnitCategory(name: "AppFeature", description: "19 feature flags controlling app access", items: [
         UnitItem(name: "dashboard, clientProfiles, basicAssessment, neuroWatch", description: "Core features", values: [], status: "✓"),

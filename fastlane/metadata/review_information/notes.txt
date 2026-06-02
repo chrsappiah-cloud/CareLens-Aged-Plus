@@ -18,7 +18,7 @@ CHINA AVAILABILITY: This app is not offered on the China mainland App Store. We 
 
 CRASH FIX (build 4+): Resolved a SwiftData startup issue that could crash the app on launch on iPad. Verified on iPad Air 11-inch (M3) simulator and physical iPhone.
 
-IN-APP PURCHASE REMOVAL (build 5): All StoreKit subscription UI and in-app purchase references have been removed. Access tiers are assigned by organisation administrators only. No IAP products are attached to this submission.
+ACCESS: The app does not include locked digital content, admin-managed access request flows, or user-facing access screens. Access levels are assigned by organisation administrators only.
 
 No special hardware required. CloudKit sync uses the reviewer's Apple ID sandbox environment.
 
