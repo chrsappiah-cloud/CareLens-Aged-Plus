@@ -33,25 +33,30 @@ struct BiopsychosocialIntakeView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            progressBar
-            ScrollView {
-                VStack(alignment: .leading, spacing: CLTheme.spacing) {
-                    if currentSection < sections.count {
-                        let section = sections[currentSection]
-                        Text(section.title)
-                            .font(.title3.bold())
-                            .foregroundStyle(CareLensTheme.Colors.textPrimary)
-                            .padding(.top)
+        ScrollView {
+            VStack(alignment: .leading, spacing: CLTheme.spacing) {
+                progressBar
+                    .frame(height: 4)
 
-                        ForEach(section.fields, id: \.label) { field in
-                            fieldView(for: field)
-                        }
+                if currentSection < sections.count {
+                    let section = sections[currentSection]
+                    Text(section.title)
+                        .font(.title3.bold())
+                        .foregroundStyle(CareLensTheme.Colors.textPrimary)
+                        .padding(.top)
+
+                    ForEach(section.fields, id: \.label) { field in
+                        fieldView(for: field)
                     }
                 }
-                .padding()
-            }
 
+                if currentSection == sections.count - 1 {
+                    clinicalReferencesForModule
+                }
+            }
+            .padding()
+        }
+        .safeAreaInset(edge: .bottom) {
             bottomBar
         }
         .background(Color.clear)
@@ -97,11 +102,15 @@ struct BiopsychosocialIntakeView: View {
                     HStack { Text("Next"); Image(systemName: "arrow.right") }
                 }
                 .buttonStyle(DiamondButtonStyle())
+                .frame(minHeight: 50)
+                .accessibilityIdentifier("button.next")
             } else {
                 Button(action: { completeAssessment() }) {
                     HStack { Image(systemName: "checkmark"); Text("Complete") }
                 }
                 .buttonStyle(DiamondButtonStyle())
+                .frame(minHeight: 50)
+                .accessibilityIdentifier("button.complete")
             }
         }
         .padding()
@@ -173,6 +182,21 @@ struct BiopsychosocialIntakeView: View {
             assessorRole: "Social Worker"
         )
         modelContext.insert(assessment)
+    }
+
+    @ViewBuilder
+    private var clinicalReferencesForModule: some View {
+        switch moduleName {
+        case "Function & Safety":
+            ClinicalReferencesView.functionSafety()
+        case "Biopsychosocial Intake", "Mood, Anxiety & Delirium",
+             "Spiritual Assessment", "Advance Care Planning",
+             "Support Systems & Caregiving", "Income, Insurance & Services",
+             "Intervention Review":
+            ClinicalReferencesView.biopsychosocial()
+        default:
+            ClinicalReferencesView.biopsychosocial()
+        }
     }
 
     private func completeAssessment() {

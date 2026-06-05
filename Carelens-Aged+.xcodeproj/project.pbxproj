@@ -290,7 +290,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Carelens-Aged+/Carelens_Aged_.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606030930;
+				CURRENT_PROJECT_VERSION = 202606041020;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -299,8 +299,6 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.medical";
 				INFOPLIST_KEY_NSCameraUsageDescription = "CareLens uses the camera only when you attach clinical photos to a client record.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "CareLens can read health data you choose to link for monitoring insights.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CareLens can write health metrics you approve for longitudinal monitoring.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "CareLens accesses your photo library when you attach images to assessments.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -331,7 +329,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Carelens-Aged+/Carelens_Aged_.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606030930;
+				CURRENT_PROJECT_VERSION = 202606041020;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -340,8 +338,6 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.medical";
 				INFOPLIST_KEY_NSCameraUsageDescription = "CareLens uses the camera only when you attach clinical photos to a client record.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "CareLens can read health data you choose to link for monitoring insights.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CareLens can write health metrics you approve for longitudinal monitoring.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "CareLens accesses your photo library when you attach images to assessments.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -493,7 +489,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606030930;
+				CURRENT_PROJECT_VERSION = 202606041020;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -515,7 +511,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606030930;
+				CURRENT_PROJECT_VERSION = 202606041020;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -536,7 +532,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606030930;
+				CURRENT_PROJECT_VERSION = 202606041020;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
@@ -556,7 +552,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606030930;
+				CURRENT_PROJECT_VERSION = 202606041020;
 				DEVELOPMENT_TEAM = TM2WG7HH96;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;

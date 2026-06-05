@@ -117,20 +117,34 @@ struct DifferentialView: View {
                 if let result = result {
                     resultSection(result)
                 }
+                ClinicalReferencesView.differential()
             }
             .padding()
         }
         .navigationTitle("Differential Screen")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .bottomBar) {
-                HStack {
-                    Spacer()
-                    Button("Analyse Pattern") { analyse() }
-                        .buttonStyle(.borderedProminent)
-                        .tint(CLTheme.accentTeal)
+        .safeAreaInset(edge: .bottom) {
+            HStack {
+                Spacer()
+                Button(action: { analyse() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "waveform.path.ecg")
+                        Text("Analyse Pattern")
+                    }
+                    .font(.body.bold())
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 14)
+                    .frame(minWidth: 200, minHeight: 50)
+                    .background(CLTheme.accentTeal)
+                    .cornerRadius(14)
                 }
+                .accessibilityIdentifier("button.analysePattern")
+                Spacer()
             }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .background(.ultraThinMaterial)
         }
     }
 
