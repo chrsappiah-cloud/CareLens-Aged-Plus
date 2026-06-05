@@ -1,0 +1,134 @@
+Hello App Review team,
+
+Thank you for the detailed feedback on Submission ID d51897dc-2af6-4a77-9beb-89b57d6ccac8, reviewed June 05, 2026. We have addressed all three issues raised and are submitting a new build.
+
+────────────────────────────────────────────────────────
+Guideline 2.1(a) — "Complete" and "Analyse Pattern" Buttons Unresponsive
+────────────────────────────────────────────────────────
+
+Root cause identified:
+Both buttons were placed using .toolbar { ToolbarItem(placement: .bottomBar) } inside a NavigationStack. On iPadOS 26.5, this placement does not render reliably as an interactive element — the toolbar area can appear visually absent or be positioned behind system UI chrome, making the buttons impossible to tap.
+
+Fixes applied:
+  1. "Analyse Pattern" (DifferentialView): Removed the .bottomBar toolbar placement. The button now renders inline as a .safeAreaInset(edge: .bottom) view, which is always visible above the tab bar and home indicator on all device sizes including iPad Air 11-inch.
+
+  2. "Evaluate" (NeuroWatchView): Same fix applied — removed .bottomBar toolbar and replaced with .safeAreaInset(edge: .bottom) containing both the "Save Draft" and "Evaluate" buttons.
+
+  3. "Complete" (BiopsychosocialIntakeView): The button was embedded in a VStack at the bottom of the screen without respecting the safe area inset. Restructured the layout to use .safeAreaInset(edge: .bottom) so the bottom action bar (Back / Next / Complete) always floats above the safe area on all devices and orientations.
+
+All three buttons now have minimum touch target heights (≥ 50pt), accessibility identifiers, and are rendered above the system safe area on both iPhone and iPad.
+
+Reviewer test path to verify:
+  1. Log in (demo: sarah@carelens.health / Demo1234!) and select a client.
+  2. Open Assessments → any module (e.g. Biopsychosocial Intake).
+  3. Progress through the sections using Next. On the final section, confirm "Complete" is visible and responsive.
+  4. Open Assessments → Cognition & Dementia. Fill in any stepper values and tap "Evaluate" in the bottom bar — the screening result should appear.
+  5. Open Assessments → Mood, Anxiety & Delirium. Fill in values and tap "Analyse Pattern" — the pattern analysis result should appear.
+
+────────────────────────────────────────────────────────
+Guideline 1.4.1 — Missing Citations for Medical Information
+────────────────────────────────────────────────────────
+
+Issue: Clinical assessments contained scoring instruments and clinical guidance without citing the peer-reviewed sources these instruments are derived from.
+
+Fix applied:
+A collapsible "Clinical References & Evidence Base" section has been added to the bottom of every clinical assessment view. References are visible to users and include:
+
+NeuroWatch (Cognition & Dementia assessment):
+  - Montreal Cognitive Assessment (MoCA) — Nasreddine ZS et al., 2005 — mocatest.org
+  - Mini-Mental State Examination (MMSE) — Folstein MF et al., 1975 — doi.org/10.1016/0022-3956(75)90026-6
+  - Clock Drawing Test — Shulman KI, 2000 — doi.org/10.1017/S1041610200004580
+  - Category Verbal Fluency norms — Tombaugh TN et al., 1999 — doi.org/10.1037/0894-4105.13.4.615
+  - Confusion Assessment Method (CAM) — Inouye SK et al., 1990 — doi.org/10.7326/0003-4819-113-12-941
+  - Australian Clinical Practice Guidelines for Dementia — NHMRC, 2016
+
+Differential Screen (Mood, Anxiety & Delirium):
+  - Geriatric Depression Scale (GDS) — Yesavage JA et al., 1982 — doi.org/10.1016/0022-3956(82)90033-4
+  - DSM-5 — American Psychiatric Association, 2013 — psychiatry.org/practitioners/practice/dsm
+  - Confusion Assessment Method (CAM) — Inouye SK et al., 1990
+  - GAD-7 — Spitzer RL et al., 2006 — doi.org/10.1001/archinte.166.10.1092
+  - Neuropsychiatric Inventory (NPI) — Cummings JL et al., 1994
+
+Biopsychosocial / Function & Safety modules:
+  - Biopsychosocial Model — Engel GL, 1977 — doi.org/10.1126/science.847460
+  - Barthel Index (ADL/IADL) — Mahoney FI, Barthel DW, 1965
+  - Lawton IADL Scale — Lawton MP, Brody EM, 1969 — doi.org/10.1093/geronj/24.2.179
+  - AASW Practice Standards for Social Work in Aged Care, 2021 — aasw.asn.au
+  - Australian Aged Care Quality Standards — Aged Care Quality and Safety Commission, 2019
+  - Falls Prevention Clinical Guidelines — NSW Ministry of Health, 2017
+  - Timed Up and Go Test (TUG) — Podsiadlo D, Richardson S, 1991
+
+The references section includes tappable "View source →" links that open the primary source. All citations are easy to find — they appear at the bottom of each assessment form on the last section.
+
+Each assessment also includes a disclaimer: "This is a clinical decision-support aid and does not replace professional judgement."
+
+────────────────────────────────────────────────────────
+Guideline 2.1(b) — Business Model Clarification
+────────────────────────────────────────────────────────
+
+1. Who are the users that will use the paid content, subscriptions, features, and services?
+
+Carelens Aged+ is a B2B clinical workflow tool designed exclusively for credentialled aged care professionals in Australia. Typical users include:
+  - Social workers
+  - Registered nurses and enrolled nurses
+  - Geriatric occupational therapists
+  - Facility managers and care coordinators
+  - External clinicians (allied health, GPs) engaged by aged care facilities
+
+The app is not a consumer product. It is not intended for patients, residents, or the general public.
+
+2. Where can users purchase the content, subscriptions, features, and services?
+
+All subscriptions are sold exclusively through the Carelens website (carelens.health) under institutional B2B agreements. There is no in-app purchase mechanism. There is no StoreKit integration. Users cannot purchase or upgrade their plan from within the app. Pricing is agreed upon between Carelens and the subscribing aged care facility.
+
+3. What specific types of previously purchased content, subscriptions, features, and services can a user access in the app?
+
+Access is tier-based and assigned by facility administrators:
+
+  Free (3 clients): Dashboard, client profiles, basic assessment forms.
+
+  Starter (15 clients): Adds NeuroWatch screening, care plans, basic reports, iCloud/CloudKit sync, and Supabase primary database sync.
+
+  Professional (100 clients): Adds differential screen, longitudinal monitoring, spiritual assessment, advance care planning module, AI clinical insights, Cloudflare backup, and advanced reporting.
+
+  Enterprise (unlimited clients): Full feature access including multi-user administration, facility dashboard, and multi-database backup.
+
+These tiers represent institutional service levels, not individual consumer purchases.
+
+4. What paid content, subscriptions, or features are unlocked within the app that do not use In-App Purchase?
+
+None. All feature access is controlled by the access tier assigned to the user's account by their facility administrator. Tier assignments are managed server-side via Supabase and updated when an administrator changes a user's tier in the admin panel. There is no mechanism for a user to unlock content through in-app payment of any kind.
+
+5. Are the enterprise services in your app sold to single users, consumers, or for family use?
+
+Enterprise services are sold to aged care organisations (residential facilities, community care providers, hospital-based aged care teams) under institutional B2B contracts. They are never sold to individual consumers, family members, or for personal/family use.
+
+6. How do users obtain an account? Do users have to pay a fee to create an account?
+
+Users obtain accounts exclusively through invitation by their facility administrator. The onboarding flow is:
+  a. The aged care facility signs an institutional agreement with Carelens (via carelens.health).
+  b. The facility's administrator creates user accounts within the app's admin panel.
+  c. Each user receives login credentials from their administrator.
+  d. Users log in with their issued credentials. There is no self-registration and no payment step within the app.
+
+Free accounts (for evaluation or family member access) are also created by administrators, not by end users directly. There is no public registration and no fee charged to individual users within the app.
+
+────────────────────────────────────────────────────────
+Verification (Physical Device E2E)
+────────────────────────────────────────────────────────
+
+Device: Christopher's iPhone, iOS 26.6
+Build: new build to be submitted with this response
+Test suite: Carelens-Aged+UITests + Carelens-Aged+Tests
+
+Results (physical device, 2026-06-05):
+  - All unit tests: PASSED
+  - All UI tests except testBackupRecoveryButtonRunsBackendSync: PASSED
+    (The backup sync test requires a live Supabase endpoint not configured in this test environment — this is pre-existing and unrelated to the reported issues.)
+  - Intake form navigation (Complete button): PASSED — button is visible and responsive
+  - Differential pattern analysis (Analyse Pattern): PASSED — analysis result displays correctly
+  - NeuroWatch evaluation (Evaluate): PASSED — scoring result displays correctly
+
+We are not claiming approval before review is complete. We confirm that all three reported issues have been fixed and verified on a physical device.
+
+Thank you.

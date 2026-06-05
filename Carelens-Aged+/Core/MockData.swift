@@ -114,7 +114,7 @@ enum MockData {
                 "Webster pack for medication management",
                 "Home safety assessment and modifications",
                 "Carer support group referral for John",
-                "Monthly NeuroWatch monitoring"
+                "Scheduled NeuroWatch monitoring"
             ],
             immediateActions: [
                 "Arrange falls prevention assessment",

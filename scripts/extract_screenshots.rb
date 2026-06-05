@@ -4,55 +4,45 @@
 require "fileutils"
 require "json"
 require "open3"
+require "tmpdir"
 
 xcresult, out_dir = ARGV
 abort "Usage: extract_screenshots.rb <path.xcresult> <output_dir>" unless xcresult && out_dir
 
 FileUtils.mkdir_p(out_dir)
 
-json, status = Open3.capture2(
-  "xcrun", "xcresulttool", "get", "object", "--legacy",
-  "--path", xcresult,
-  "--format", "json"
-)
-abort "xcresulttool failed" unless status.success?
+tmpdir = Dir.mktmpdir("carelens-screenshots-")
+manifest_path = File.join(tmpdir, "manifest.json")
 
-data = JSON.parse(json)
-actions = data.dig("actions", "_values") || []
+status = system(
+  "xcrun", "xcresulttool", "export", "attachments",
+  "--path", xcresult,
+  "--output-path", tmpdir,
+  out: File::NULL
+)
+abort "xcresulttool export attachments failed" unless status && File.exist?(manifest_path)
+
+manifest = JSON.parse(File.read(manifest_path))
 exported = 0
 
-actions.each do |action|
-  tests = action.dig("actionResult", "testsRef", "id", "_value")
-  next unless tests
+manifest.each do |entry|
+  (entry["attachments"] || []).each do |attachment|
+    next if attachment["isAssociatedWithFailure"]
 
-  tests_json, = Open3.capture2(
-    "xcrun", "xcresulttool", "get", "object", "--legacy",
-    "--path", xcresult, "--id", tests, "--format", "json"
-  )
-  suites = JSON.parse(tests_json).dig("summaries", "_values") || []
+    suggested = attachment["suggestedHumanReadableName"].to_s
+    next unless suggested.match?(/^\d{2}_/)
 
-  suites.each do |suite|
-    (suite.dig("tests", "_values") || []).each do |test_group|
-      (test_group.dig("subtests", "_values") || []).each do |test|
-        (test.dig("attachments", "_values") || []).each do |attachment|
-          name = attachment.dig("name", "_value")
-          payload_id = attachment.dig("payloadRef", "id", "_value")
-          next unless name && payload_id && name.match?(/^\d{2}_/)
+    base_name = suggested.split("_0_").first
+    source = File.join(tmpdir, attachment["exportedFileName"])
+    next unless File.exist?(source)
 
-          dest = File.join(out_dir, "#{name}.png")
-          system(
-            "xcrun", "xcresulttool", "export", "--legacy",
-            "--path", xcresult,
-            "--id", payload_id,
-            "--output-path", dest,
-            out: File::NULL, err: File::NULL
-          )
-          exported += 1 if File.exist?(dest)
-          puts "Exported #{dest}" if File.exist?(dest)
-        end
-      end
-    end
+    dest = File.join(out_dir, "#{base_name}.png")
+    FileUtils.cp(source, dest)
+    exported += 1
+    puts "Exported #{dest}"
   end
 end
 
+FileUtils.rm_rf(tmpdir)
 puts "Total exported: #{exported} -> #{out_dir}"
+abort "No screenshots exported" if exported.zero?

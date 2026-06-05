@@ -24,7 +24,10 @@ final class AssessmentSession {
     var summaryJSON: Data?
     var sectionsJSON: Data?
 
-    @Relationship(deleteRule: .cascade) var sections: [AssessmentSection] = []
+    @Relationship(deleteRule: .cascade, inverse: \AssessmentSection.assessment)
+    var sections: [AssessmentSection] = []
+
+    var client: ClientProfile?
 
     var assessmentStatus: AssessmentStatus {
         AssessmentStatus(rawValue: status) ?? .draft
@@ -57,6 +60,8 @@ final class AssessmentSection {
     var fieldsJSON: Data?
     var notes: String
     var completedAt: Date?
+
+    var assessment: AssessmentSession?
 
     init(
         id: String = UUID().uuidString,

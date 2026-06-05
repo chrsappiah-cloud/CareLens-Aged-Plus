@@ -59,16 +59,16 @@ Evidence-based tools: MMSE, Katz ADL Index, GDS, FRAT
 
 ## Page 4: Scalable SaaS Revenue Model
 
-![Subscription Model](assets/promo_04_subscription_model.png)
+![Access Model](assets/promo_04_service access_model.png)
 
-### 4-Tier Subscription with Apple Pay
+### 4-Tier Administrator-Managed Access
 
-| Tier | Price | Target |
+| Tier | Access | Target |
 |---|---|---|
-| Free | $0/month | Individuals |
-| Starter | $9.99/month | Families & caregivers |
-| Professional | $29.99/month | Professional caregivers |
-| Enterprise | $99.99/month | Organisations |
+| Basic | Admin assigned | Individuals |
+| Starter | Admin assigned | Families & caregivers |
+| Professional | Admin assigned | Professional caregivers |
+| Enterprise | Admin assigned | Organisations |
 
 ### 5-Year Revenue Projections
 
@@ -150,7 +150,7 @@ SOC 2 Type II | HIPAA | Australian Privacy Act 1988 | ISO 27001
 | Data | SwiftData |
 | Cloud | CloudKit + Supabase |
 | AI Engine | OpenAI GPT-4o |
-| Payments | StoreKit 2 / Apple Pay |
+| Access | Administrator managed |
 | CI/CD | GitHub Actions → TestFlight → App Store |
 
 ### Principles

@@ -18,6 +18,7 @@ struct NeuroWatchView: View {
                     resultSection(result)
                 }
                 monitoringChartSection
+                referencesSection
             }
             .padding()
         }
@@ -25,21 +26,26 @@ struct NeuroWatchView: View {
         .navigationTitle("NeuroWatch")
         .navigationBarTitleDisplayMode(.inline)
         .careLensDarkChrome()
-        .toolbar {
-            ToolbarItem(placement: .bottomBar) {
-                HStack {
-                    Button("Save Draft") { saveDraft() }
-                        .buttonStyle(DiamondSecondaryButtonStyle())
-                    Spacer()
-                    Button(action: { evaluate() }) {
-                        HStack {
-                            Image(systemName: "sparkles")
-                            Text("Evaluate")
-                        }
+        .safeAreaInset(edge: .bottom) {
+            HStack {
+                Button("Save Draft") { saveDraft() }
+                    .buttonStyle(DiamondSecondaryButtonStyle())
+                    .frame(minHeight: 50)
+                Spacer()
+                Button(action: { evaluate() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                        Text("Evaluate")
                     }
-                    .buttonStyle(DiamondButtonStyle())
                 }
+                .buttonStyle(DiamondButtonStyle())
+                .frame(minHeight: 50)
+                .accessibilityIdentifier("button.evaluate")
             }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .background(.ultraThinMaterial)
+            .overlay(Rectangle().fill(Color.white.opacity(0.08)).frame(height: 1), alignment: .top)
         }
     }
 
@@ -149,6 +155,10 @@ struct NeuroWatchView: View {
             }
         }
         .clCard()
+    }
+
+    private var referencesSection: some View {
+        ClinicalReferencesView.neuroWatch()
     }
 
     private var monitoringChartSection: some View {

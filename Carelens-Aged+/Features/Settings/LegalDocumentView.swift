@@ -30,7 +30,6 @@ enum LegalDocument: String, Identifiable {
             How we use data
             • To deliver assessments, care plans, reports, and NeuroWatch insights you request.
             • To sync data through Apple CloudKit and optional encrypted backup services.
-            • To process in-app subscriptions through Apple In-App Purchase.
             • AI-assisted features send only the minimum clinical context required to generate decision-support text. Outputs are not a diagnosis and must be reviewed by a qualified clinician.
 
             Storage & security
@@ -44,7 +43,7 @@ enum LegalDocument: String, Identifiable {
             • Contact privacy@myworldclass.org for access, correction, or deletion requests.
 
             Retention
-            • Active records are retained while your subscription and facility account remain active.
+            • Active records are retained while your facility account remains active.
             • Deleted records are removed from primary systems within 30 days, subject to legal hold requirements.
 
             Contact
@@ -64,9 +63,8 @@ enum LegalDocument: String, Identifiable {
             • You must provide accurate registration information and safeguard credentials.
             • Organisation administrators are responsible for user provisioning and access reviews.
 
-            Subscriptions
-            • Paid tiers are billed through Apple In-App Purchase and subject to Apple's payment terms.
-            • Feature availability depends on your active subscription tier.
+            Access tiers
+            • Feature availability depends on the access tier assigned by your organisation administrator.
 
             Acceptable use
             • Do not upload unlawful content or attempt to disrupt the service.
@@ -102,7 +100,7 @@ enum LegalDocument: String, Identifiable {
             • Backup restoration is available to Enterprise tier administrators.
 
             Account termination
-            • On subscription cancellation, export tools remain available for 30 days.
+            • On account closure, export tools remain available for 30 days.
             • After 30 days, tenant data is scheduled for deletion unless a legal hold applies.
 
             Compliance

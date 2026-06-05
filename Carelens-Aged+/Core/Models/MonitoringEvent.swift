@@ -16,6 +16,8 @@ final class MonitoringEvent {
     var caregiverStress: Double?
     var medicationAdherence: Double?
 
+    var client: ClientProfile?
+
     init(
         id: String = UUID().uuidString,
         clientID: String,

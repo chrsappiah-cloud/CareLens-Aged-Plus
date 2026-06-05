@@ -53,6 +53,17 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | (command -v xcbeautify >/dev/null && xcbeautify || cat)
 
+      - name: Verify device E2E scripts present
+        run: |
+          test -x scripts/run_e2e_device_tests.sh
+          test -x scripts/run_e2e_device_systematic.sh
+
+      - name: Verify E2E test plan includes foundations
+        run: grep -q "FoundationsTests" E2ETests.xctestplan
+
+      - name: Verify WCS testing kit
+        run: bash scripts/wcs_test_readiness_check.sh
+
       - name: Run unit tests (required)
         run: |
           set -o pipefail
@@ -60,7 +71,8 @@ jobs:
             -project "Carelens-Aged+.xcodeproj" \
             -scheme "Carelens-Aged+" \
             -destination "${SIM_TEST_DESTINATION:-$SIM_DESTINATION}" \
-            -testPlan "E2ETests" \
+            -only-testing:"Carelens-Aged+Tests" \
+            -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
             IPHONEOS_DEPLOYMENT_TARGET="$IPHONEOS_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \

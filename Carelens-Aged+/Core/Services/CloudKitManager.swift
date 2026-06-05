@@ -205,23 +205,6 @@ actor CloudKitManager {
         return (changedRecords, deletedIDs, newToken)
     }
 
-    // MARK: - Subscriptions
-
-    func setupPushSubscriptions() async throws {
-        guard isEnabled else { return }
-        let db = try requireDatabase()
-        for zone in CKZoneName.allCases {
-            let zoneID = CKRecordZone.ID(zoneName: zone.rawValue)
-            let subscription = CKRecordZoneSubscription(zoneID: zoneID, subscriptionID: "sub_\(zone.rawValue)")
-
-            let notificationInfo = CKSubscription.NotificationInfo()
-            notificationInfo.shouldSendContentAvailable = true
-            subscription.notificationInfo = notificationInfo
-
-            _ = try await db.save(subscription)
-        }
-    }
-
     // MARK: - Conflict Resolution
 
     func resolveConflict(local: CKRecord, server: CKRecord) -> CKRecord {

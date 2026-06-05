@@ -2,20 +2,11 @@ import Foundation
 import SwiftUI
 import Combine
 
-enum SubscriptionTier: String, Codable, CaseIterable {
+enum AccessTier: String, Codable, CaseIterable {
     case free = "Free"
     case starter = "Starter"
     case professional = "Professional"
     case enterprise = "Enterprise"
-
-    var monthlyPrice: Double {
-        switch self {
-        case .free: return 0
-        case .starter: return 29.99
-        case .professional: return 79.99
-        case .enterprise: return 199.99
-        }
-    }
 
     var maxClients: Int {
         switch self {
@@ -106,18 +97,18 @@ enum AppFeature: String, Codable, CaseIterable {
 }
 
 @MainActor
-class SubscriptionManager: ObservableObject {
-    static let shared = SubscriptionManager()
+class AccessManager: ObservableObject {
+    static let shared = AccessManager()
 
     @Published var managedUsers: [AppUser] = []
 
-    func canAccess(feature: AppFeature, tier: SubscriptionTier) -> Bool {
+    func canAccess(feature: AppFeature, tier: AccessTier) -> Bool {
         tier.features.contains(feature)
     }
 
-    func upgradeUser(_ userID: String, to tier: SubscriptionTier) {
+    func setAccessTier(for userID: String, to tier: AccessTier) {
         if let index = managedUsers.firstIndex(where: { $0.id == userID }) {
-            managedUsers[index].subscriptionTier = tier
+            managedUsers[index].accessTier = tier
         }
     }
 
@@ -137,10 +128,10 @@ class SubscriptionManager: ObservableObject {
 
     init() {
         managedUsers = [
-            AppUser(id: "u1", email: "sarah.w@carelens.health", displayName: "Sarah Wilson", role: .clinician, subscriptionTier: .professional, isActive: true, facilityID: "facility_001", createdAt: Calendar.current.date(byAdding: .month, value: -3, to: .now)!, lastLoginAt: .now),
-            AppUser(id: "u2", email: "james.k@carelens.health", displayName: "James Kim", role: .clinician, subscriptionTier: .starter, isActive: true, facilityID: "facility_001", createdAt: Calendar.current.date(byAdding: .month, value: -1, to: .now)!, lastLoginAt: Calendar.current.date(byAdding: .day, value: -2, to: .now)),
-            AppUser(id: "u3", email: "maria.p@family.com", displayName: "Maria Papadopoulos", role: .familyMember, subscriptionTier: .free, isActive: true, facilityID: nil, createdAt: Calendar.current.date(byAdding: .day, value: -14, to: .now)!, lastLoginAt: nil),
-            AppUser(id: "u4", email: "nurse.chen@sunrise.care", displayName: "Nurse Chen", role: .carer, subscriptionTier: .starter, isActive: false, facilityID: "facility_001", createdAt: Calendar.current.date(byAdding: .month, value: -2, to: .now)!, lastLoginAt: Calendar.current.date(byAdding: .day, value: -21, to: .now)),
+            AppUser(id: "u1", email: "sarah.w@carelens.health", displayName: "Sarah Wilson", role: .clinician, accessTier: .professional, isActive: true, facilityID: "facility_001", createdAt: Calendar.current.date(byAdding: .month, value: -3, to: .now)!, lastLoginAt: .now),
+            AppUser(id: "u2", email: "james.k@carelens.health", displayName: "James Kim", role: .clinician, accessTier: .starter, isActive: true, facilityID: "facility_001", createdAt: Calendar.current.date(byAdding: .month, value: -1, to: .now)!, lastLoginAt: Calendar.current.date(byAdding: .day, value: -2, to: .now)),
+            AppUser(id: "u3", email: "maria.p@family.com", displayName: "Maria Papadopoulos", role: .familyMember, accessTier: .free, isActive: true, facilityID: nil, createdAt: Calendar.current.date(byAdding: .day, value: -14, to: .now)!, lastLoginAt: nil),
+            AppUser(id: "u4", email: "nurse.chen@sunrise.care", displayName: "Nurse Chen", role: .carer, accessTier: .starter, isActive: false, facilityID: "facility_001", createdAt: Calendar.current.date(byAdding: .month, value: -2, to: .now)!, lastLoginAt: Calendar.current.date(byAdding: .day, value: -21, to: .now)),
         ]
     }
 }

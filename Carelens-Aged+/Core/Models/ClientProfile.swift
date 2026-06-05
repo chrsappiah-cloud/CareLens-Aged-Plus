@@ -20,9 +20,12 @@ final class ClientProfile {
     var createdAt: Date
     var updatedAt: Date
 
-    @Relationship(deleteRule: .cascade) var assessments: [AssessmentSession] = []
-    @Relationship(deleteRule: .cascade) var carePlans: [CarePlan] = []
-    @Relationship(deleteRule: .cascade) var monitoringEvents: [MonitoringEvent] = []
+    @Relationship(deleteRule: .cascade, inverse: \AssessmentSession.client)
+    var assessments: [AssessmentSession] = []
+    @Relationship(deleteRule: .cascade, inverse: \CarePlan.client)
+    var carePlans: [CarePlan] = []
+    @Relationship(deleteRule: .cascade, inverse: \MonitoringEvent.client)
+    var monitoringEvents: [MonitoringEvent] = []
 
     var fullName: String { "\(firstName) \(lastName)" }
     var age: Int {
